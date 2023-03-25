@@ -5,12 +5,12 @@
 
 ### Backend
 ```bash
-yarn start
+yarn dev
 ```
 
 ### Frontend
 ```bash
-yarn start
+yarn dev
 ```
 
 BE SURE TO HAVE ENOUGH FAUCET

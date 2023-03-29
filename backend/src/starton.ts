@@ -52,7 +52,6 @@ class Starton {
     console.log('$> [STARTON]\tuploadMetadataOnIPFS')
 
     const ipfsJsons: Array<string> = []
-    let i = 0;
 
     for (const picturesCid of picturesCids) {
 
@@ -60,7 +59,7 @@ class Starton {
         const ipfsJson = await this.axiosInstance.post("/ipfs/json", {
             name: `${smartContractName} - Metadata`,
             content: {
-              name: `${smartContractName} NFT #${i}`,
+              name: `${smartContractName} NFT`,
               description: "NFT Description",
               image: `ipfs://ipfs/${picturesCid}`,
               attributes: {
@@ -79,7 +78,6 @@ class Starton {
         throw error;
       }
 
-      i++;
     }
     console.log('$> [STARTON]\tuploadPicturesOnIPFS - SUCCESS')
     return ipfsJsons

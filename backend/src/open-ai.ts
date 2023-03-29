@@ -4,7 +4,7 @@ class OpenAI {
   private OPEN_AI_API_KEY: string = process.env.OPEN_AI_API_KEY || '';
   private axiosInstance: AxiosInstance;
   private PROMPT: string = 'random abstract majestic complex picture 8k';
-  private N: number = 1
+  private N: number = 5
   private SIZE: string = '1024x1024';
 
   constructor() {

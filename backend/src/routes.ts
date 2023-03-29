@@ -74,10 +74,10 @@ router.post('/deploy', async (req, res) => {
 
   console.log('picturesBuffers - ', picturesBuffers)
 
-  let cids: Array<string> = []
+  let picturesCids: Array<string> = []
 
   try {
-    cids = await App.starton.uploadPicturesOnIPFS(picturesBuffers)
+    picturesCids = await App.starton.uploadPicturesOnIPFS(picturesBuffers)
   } catch (e) {
     return res.status(500).send({
       message: 'Could not upload pictures on IPFS',
@@ -85,12 +85,26 @@ router.post('/deploy', async (req, res) => {
     })
   }
 
-  console.log('cids - ', cids)
+  console.log('picturesCids - ', picturesCids)
+
+  let metadataCids: Array<string> = []
+
+  try {
+    metadataCids = await App.starton.uploadMetadataOnIPFS(smartContractName, picturesCids)
+  } catch (e) {
+    return res.status(500).send({
+      message: 'Could not upload metadata on IPFS',
+      error: e
+    })
+  }
+
+  console.log('metadataCids - ', metadataCids)
+
 
   let contract: string = ''
 
   try {
-    contract = await App.starton.deployContract(smartContractName, smartContractSymbol, cids.length, ownerWallet)
+    contract = await App.starton.deployContract(smartContractName, smartContractSymbol, picturesCids.length, metadataCids[0])
   } catch (e) {
     return res.status(500).send({
       message: 'Could not deploy ERC721 smart-contract',
@@ -100,7 +114,7 @@ router.post('/deploy', async (req, res) => {
 
   console.log('contract - ', contract)
   await new Promise(f=>setTimeout(f, 5000))
-  let transactions = await App.starton.mintCollection(contract, ownerWallet, cids)
+  let transactions = await App.starton.mintCollection(smartContractName, contract, ownerWallet, metadataCids)
 
   console.log('transactions - ', transactions)
 

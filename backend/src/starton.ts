@@ -30,8 +30,6 @@ class Starton {
       const data = new FormData()
       data.append("file", pictureBuffer, 'Test filename')
       data.append("isSync", "true")
-      // Optional: you can add metadata to your file (object stringified)
-      // const metadata = JSON.stringify({ your: "additionnal", meta: "data" })
 
       try {
         const ipfsFile = await this.axiosInstance.post("/ipfs/file", data, {
@@ -50,7 +48,44 @@ class Starton {
     return ipfsFiles
   }
 
-  public async deployContract(smartContractName: string, smartContractSymbol: string, supply: number, ownerWallet: string): Promise<any> {
+  public async uploadMetadataOnIPFS(smartContractName: string, picturesCids: Array<string>): Promise<Array<string>> {
+    console.log('$> [STARTON]\tuploadMetadataOnIPFS')
+
+    const ipfsJsons: Array<string> = []
+    let i = 0;
+
+    for (const picturesCid of picturesCids) {
+
+      try {
+        const ipfsJson = await this.axiosInstance.post("/ipfs/json", {
+            name: `${smartContractName} - Metadata`,
+            content: {
+              name: `${smartContractName} NFT #${i}`,
+              description: "NFT Description",
+              image: `ipfs://ipfs/${picturesCid}`,
+              attributes: {
+                size: 42,
+                media: "picture",
+                company: "Starton"
+              }
+            },
+            metadata: {},
+        })
+        ipfsJsons.push(ipfsJson.data.cid)
+
+      } catch (e) {
+        const error = e.response.data
+        console.error(error)
+        throw error;
+      }
+
+      i++;
+    }
+    console.log('$> [STARTON]\tuploadPicturesOnIPFS - SUCCESS')
+    return ipfsJsons
+  }
+
+  public async deployContract(smartContractName: string, smartContractSymbol: string, supply: number, contractPreviewCID: string): Promise<any> {
     console.log('$> [STARTON]\tdeployContract')
 
     try {
@@ -68,7 +103,7 @@ class Starton {
             smartContractSymbol,
             supply,
             "ipfs://ipfs/",
-            "",
+            `ipfs://ipfs/${contractPreviewCID}`,
             this.STARTON_SIGNER_WALLET
           ]
         }
@@ -83,7 +118,7 @@ class Starton {
     }
   }
 
-  public async mintCollection(contract: string, ownerWallet: string, cids: Array<string>): Promise<string> {
+  public async mintCollection(smartContractName: string, contract: string, ownerWallet: string, cids: Array<string>): Promise<string> {
     console.log('$> [STARTON]\tmintCollection')
 
     let transaction;

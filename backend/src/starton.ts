@@ -59,7 +59,7 @@ class Starton {
         const ipfsJson = await this.axiosInstance.post("/ipfs/json", {
             name: `${smartContractName} - Metadata`,
             content: {
-              name: `${smartContractName} NFT`,
+              name: `${smartContractName}`,
               description: "NFT Description",
               image: `ipfs://ipfs/${picturesCid}`,
               attributes: {

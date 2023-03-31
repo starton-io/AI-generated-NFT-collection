@@ -1,0 +1,11 @@
+{
+	"seo": {
+		"title": "Accueil",
+		"description": "Notre page d'acceuil"
+	},
+	"content": {
+		"sign-in-with": "Se connecter avec",
+		"connected" : "Vous êtes connectés avec le wallet ",
+		"disconnect": "Se déconnecter"
+	}
+}

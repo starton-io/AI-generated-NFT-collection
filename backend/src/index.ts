@@ -5,6 +5,8 @@ import OpenAI from "./open-ai";
 import * as bodyParser from "body-parser";
 import helmet from "helmet";
 import { Router } from "./routes";
+const cors = require('cors');
+
 
 console.log('$> [CONFIG]\tInitializing environment...')
 dotenv.config({ path: '../.env' })
@@ -31,6 +33,19 @@ class App {
     App.app.use(helmet())
     App.app.use(bodyParser.json());
     App.app.use(bodyParser.urlencoded({ extended: false }));
+    App.app.use((req, res, next) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'POST');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      next();
+    });
+    const corsOptions = {
+      origin: 'http://localhost:3000',
+      methods: 'GET,POST',
+      allowedHeaders: 'Content-Type',
+    };
+
+    App.app.use(cors(corsOptions));
     App.app.use(Router)
   }
 }

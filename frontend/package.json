@@ -1,0 +1,84 @@
+{
+	"name": "starton-boilerplate-sign-in-with-wallets-next",
+	"version": "1.1.0",
+	"private": true,
+	"license": "Apache-2.0",
+	"author": {
+		"email": "hello@starton.io",
+		"name": "Starton",
+		"url": "https://www.starton.io/"
+	},
+	"scripts": {
+		"start": "next start",
+		"dev": "next dev",
+		"build": "next build",
+		"postbuild": "next-sitemap",
+		"lint": "next lint --fix",
+		"type-check": "tsc --project tsconfig.json --pretty --noEmit"
+	},
+	"lint-staged": {
+		"./src/**/*.{js,jsx,ts,tsx}": [
+			"eslint ./src"
+		]
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	},
+	"standard-version": {
+		"no-verify": true,
+		"tag-prefix": "",
+		"skip": {
+			"tag": true
+		}
+	},
+	"dependencies": {
+		"@emotion/cache": "11.10.5",
+		"@emotion/react": "11.10.6",
+		"@emotion/server": "11.10.0",
+		"@emotion/styled": "11.10.6",
+		"@mui/icons-material": "5.11.11",
+		"@mui/material": "5.11.14",
+		"@reduxjs/toolkit": "1.9.3",
+		"@starton/ui-nextjs": "1.2.34",
+		"ethers": "5.7.2",
+		"formik": "2.2.9",
+		"formik-mui": "5.0.0-alpha.0",
+		"lodash": "4.17.21",
+		"next": "13.2.4",
+		"next-seo": "5.15.0",
+		"next-translate": "2.0.2",
+		"react": "18.2.0",
+		"react-dom": "18.2.0",
+		"react-dropzone": "14.2.3",
+		"tiny-warning": "1.0.3",
+		"wagmi": "0.12.6"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "17.1.2",
+		"@commitlint/config-conventional": "17.1.0",
+		"@starton/eslint-config-nextjs": "1.1.5",
+		"@types/lodash": "4.14.186",
+		"@types/node": "18.15.10",
+		"@types/react": "18.0.29",
+		"@types/react-dom": "18.0.11",
+		"@types/react-redux": "7.1.24",
+		"@typescript-eslint/eslint-plugin": "5.47.0",
+		"@typescript-eslint/parser": "5.47.0",
+		"commitizen": "4.2.5",
+		"cz-conventional-changelog": "3.3.0",
+		"eslint": "8.36.0",
+		"eslint-config-airbnb": "19.0.4",
+		"eslint-config-next": "13.2.4",
+		"eslint-config-prettier": "8.8.0",
+		"eslint-plugin-prettier": "4.2.1",
+		"lint-staged": "13.2.0",
+		"next-sitemap": "4.0.6",
+		"next-translate-plugin": "2.0.3",
+		"prettier": "2.8.7",
+		"prettier-eslint": "15.0.1",
+		"standard-version": "9.5.0",
+		"typescript": "5.0.2"
+	}
+}

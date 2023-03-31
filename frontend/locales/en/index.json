@@ -1,0 +1,11 @@
+{
+	"seo": {
+		"title": "Home",
+		"description": "Our homepage"
+	},
+	"content": {
+		"sign-in-with": "Sign in with",
+		"connected" : "You are connected with the wallet",
+		"disconnect": "Disconnect"
+	}
+}

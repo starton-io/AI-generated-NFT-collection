@@ -1,0 +1,19 @@
+{
+	"common": {
+		"loadingText": "Chargement...",
+		"loadingError": "Erreur de récupération de données... Nouvel essai dans quelques secondes."
+	},
+	"languages": {
+		"fr": "Français",
+		"en": "Anglais"
+	},
+	"header": {
+		"starton-tagline": "THE WEB3 FRAMEWORK"
+	},
+	"footer": {
+		"join-us" : "Rejoignez-nous sur ",
+		"discover" : "Découvrez notre ",
+		"start-building" : "Commencez à construire sur le ",
+		"website" : "site web"
+	}
+}

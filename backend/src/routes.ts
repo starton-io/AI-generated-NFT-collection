@@ -11,8 +11,27 @@ router.get('/', async (req, res) => {
 
 router.post('/generate', async (req, res) => {
   console.log('$> [API]\tPOST /generate')
+
+  if (!req.body) {
+    const error: string = 'Body is missing in your request'
+    console.log(error)
+    return res.status(400).send({
+      message: error,
+      error: null
+    })
+  }
+
+  if (!req.body.collectionName || !req.body.nbPictures || !req.body.prompt) {
+    const error: string = 'Incomplete request, you must provide collectionName, nbPictures and prompt fields'
+    console.log(error)
+    return res.status(400).send({
+      message: error,
+      error: null
+    })
+  }
+
   try {
-    const pictureArray = await App.openAi.generatePictures()
+    const pictureArray = await App.openAi.generatePictures(req.body)
     console.log('pictureArray - ', pictureArray)
     console.log('$> [API]\tPOST /generate - SUCCESS')
     return res.status(200).send(pictureArray)

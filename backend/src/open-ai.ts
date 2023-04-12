@@ -3,9 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 class OpenAI {
   private OPEN_AI_API_KEY: string = process.env.OPEN_AI_API_KEY || '';
   private axiosInstance: AxiosInstance;
-  private PROMPT: string = 'random abstract majestic complex picture 8k';
-  private N: number = 10
-  private SIZE: string = '1024x1024';
+  // private PROMPT: string = 'random abstract majestic complex picture 8k';
 
   constructor() {
     console.log('$> [OPEN AI]\tInitializing OpenAI Class...')
@@ -25,18 +23,21 @@ class OpenAI {
 
   }
 
-  public async generatePictures(): Promise<Record<'pictures', Array<string>>> {
+  public async generatePictures(body): Promise<Record<'pictures', Array<string>>> {
     console.log('$> [OPEN AI]\tgeneratePictures')
 
     const pictureArray: Array<string> = []
+    const prompt: string = body.prompt
+    const nbPictures: number = parseInt(body.nbPictures)
+    const size: string = '1024x1024'
 
     try {
       const res = await this.axiosInstance.post('/images/generations', {
-        prompt: this.PROMPT,
-        n: this.N,
-        size: this.SIZE
+        prompt: prompt,
+        n: nbPictures,
+        size: size
       })
-      for (let i = 0; i < this.N; i++) {
+      for (let i = 0; i < nbPictures; i++) {
         pictureArray.push(res.data.data[i].url)
       }
       console.log('$> [OPEN AI]\tgeneratePictures - SUCCESS')

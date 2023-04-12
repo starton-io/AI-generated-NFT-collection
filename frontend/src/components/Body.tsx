@@ -127,10 +127,11 @@ export const Body: React.FC<BodyProps> = () => {
 			</Typography>
 			<Box display="flex" flexDirection="column" gap={2}>
 				<Typography variant="h3" textTransform="uppercase">
-					Collection details
+					Collection parameters
 				</Typography>
 				<Typography color="text.secondary" variant="body1">
-					We know you can't wait to generate your NFT collection but before that, it is important to add some details so that it is unique.
+				We understand your eagerness to create your NFT collection. To do so, enter all the details for your collection. 
+				Enter a prompt and click generate to discover the visual assets of your NFTs. You can regenerate assets. When satisfied, click deploy to create your collection. 
 				</Typography>
 			</Box>
 
@@ -139,7 +140,7 @@ export const Body: React.FC<BodyProps> = () => {
 					<Field
 						component={StartonFormikTextField}
 						name={'Wallet address'}
-						label={'Wallet address'}
+						label={'Wallet address (To)'}
 						placeholder={'0x...'}
 					/>
 					<Field
@@ -163,7 +164,7 @@ export const Body: React.FC<BodyProps> = () => {
 					<Field
 						component={StartonFormikTextField}
 						name={'Number of pictures'}
-						label={'Number of pictures'}
+						label={'Number of NFTs'}
 						placeholder={'5'}
 						type={'number'}
 					/>

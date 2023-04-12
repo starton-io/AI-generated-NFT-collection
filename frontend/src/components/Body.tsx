@@ -232,15 +232,16 @@ export const Body: React.FC<BodyProps> = () => {
 				</Form>
 			</Formik>
 
-			<Grid
-				container
-				display={'flex'}
-				flexDirection="row"
-				alignContent={'space-between'}
-				maxWidth={'100%'}
-				rowSpacing={1}
-			>
-				{pictures.map((picture) => (
+			{ isGenerated
+				? <Grid
+					container
+					display={'flex'}
+					flexDirection="row"
+					alignContent={'space-between'}
+					maxWidth={'100%'}
+					rowSpacing={1}
+				>
+					{pictures.map((picture) => (
 						<Grid item xs={2.3} key={picture} >
 							<img
 								src={`${picture}`}
@@ -252,64 +253,63 @@ export const Body: React.FC<BodyProps> = () => {
 							/>
 						</Grid>
 					))}
-			</Grid>
+				</Grid>
+				: null}
 
-			<Box display="flex" flexDirection="row" gap={10} margin="auto" alignItems={'center'} padding={3} flexWrap={'wrap'}>
 				{isGenerated
 					? isDeployed
-						? <Box display="flex" flexDirection="row" gap={3} margin="auto" alignItems={'center'} padding={3}>
-							<StartonButton
-								size="large"
-								variant="contained"
-								color="primary"
-								disabled={isGenerationLoading}
-								startIcon={
-									<OpenseaSvg />
-								}
-								// onClick={}
-							>
-								Opensea
-							</StartonButton>
-							<StartonButton
-								size="large"
-								variant="contained"
-								color="primary"
-								disabled={isGenerationLoading}
-								startIcon={
-									<ElementSvg />
-								}
+						? <Box display="flex" flexDirection="row" gap={10} margin="auto" alignItems={'center'} padding={3} flexWrap={'wrap'}>
+							<Box display="flex" flexDirection="row" gap={3} margin="auto" alignItems={'center'} padding={3}>
+								<StartonButton
+									size="large"
+									variant="contained"
+									color="primary"
+									disabled={isGenerationLoading}
+									startIcon={<OpenseaSvg />}
+									// onClick={}
+								>
+									Opensea
+								</StartonButton>
+								<StartonButton
+									size="large"
+									variant="contained"
+									color="primary"
+									disabled={isGenerationLoading}
+									startIcon={<ElementSvg />}
 								// onClick={deployCollection}
-							>
-								Element
-							</StartonButton>
-
+								>
+									Element
+								</StartonButton>
+							</Box>
 						</Box>
-						: <StartonButton
-							size="large"
-							variant="contained"
-							color="secondary"
-							disabled={isDeploymentLoading}
-							startIcon={
-								isDeploymentLoading ? (
-									<CircularProgress
-										sx={{
-											width: 40,
-											height: 'unset !important',
-											color: `${theme.palette.secondary.dark} !important`,
-										}}
-									/>
-								) : null
-							}
-							onClick={deployCollection}
-						>
-							{isDeploymentLoading
-								? 'Deploying...'
-								: 'Deploy'
-							}
-						</StartonButton>
+
+						: <Box display="flex" flexDirection="row" gap={10} margin="auto" alignItems={'center'} padding={3} flexWrap={'wrap'}>
+							<StartonButton
+								size="large"
+								variant="contained"
+								color="secondary"
+								disabled={isDeploymentLoading}
+								startIcon={
+									isDeploymentLoading ? (
+										<CircularProgress
+											sx={{
+												width: 40,
+												height: 'unset !important',
+												color: `${theme.palette.secondary.dark} !important`,
+											}}
+										/>
+									) : null
+								}
+								onClick={deployCollection}
+							>
+								{isDeploymentLoading
+									? 'Deploying...'
+									: 'Deploy'
+								}
+							</StartonButton>
+						</Box>
 					: null
 				}
-			</Box>
 
 			<FAQ />
 		</Box>

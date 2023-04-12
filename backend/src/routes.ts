@@ -27,22 +27,29 @@ router.post('/generate', async (req, res) => {
 
 router.post('/deploy', async (req, res) => {
   console.log('$> [API]\tPOST /deploy')
+
   if (!req.body) {
+    const error: string = 'Body is missing in your request'
+    console.log(error)
     return res.status(400).send({
-      message: 'Body is missing in your request',
+      message: error,
       error: null
     })
   }
   if (!req.body.smartContractName || !req.body.smartContractSymbol || !req.body.ownerWallet || !req.body.pictures) {
+    const error: string = 'Incomplete request, you must provide address, smartContractName and pictures fields'
+    console.log(error)
     return res.status(400).send({
-      message: 'Incomplete request, you must provide address, smartContractName and pictures fields',
+      message: error,
       error: null
     })
   }
 
   if (!req.body.ownerWallet.match(/0x[a-fA-F0-9]{40}/)) {
+    const error: string = 'Invalid Ethereum address format'
+    console.log(error)
     return res.status(400).send({
-      message: 'Invalid Ethereum address format',
+      message: error,
       error: null
     })
   }
@@ -52,14 +59,18 @@ router.post('/deploy', async (req, res) => {
   const smartContractName: string = req.body.smartContractName
   const smartContractSymbol: string = req.body.smartContractSymbol
   const ownerWallet = req.body.ownerWallet
-  const pictures: Array<string> = req.body.pictures.toString().split(',')
+  const pictures: Array<string> = req.body.pictures ? req.body.pictures : []
 
   if (!pictures.length) {
+    const error: string = 'Incomplete request, pictures array should not be empty'
+    console.log(error)
     return res.status(400).send({
-      message: 'Incomplete request, pictures array should not be empty',
+      message: error,
       error: null
     })
   }
+
+  console.log(pictures)
 
   let picturesBuffers: Array<Buffer> = []
 

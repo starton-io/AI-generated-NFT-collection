@@ -56,6 +56,12 @@ class OpenAI {
 
     const bufferArray: Array<Buffer> = []
 
+    if (!pictures.length) {
+      const error: string = 'There is no pictures.'
+      console.error(error)
+      throw error;
+    }
+
     try {
       for (const i in pictures) {
         const res = await axios.get(pictures[i], {

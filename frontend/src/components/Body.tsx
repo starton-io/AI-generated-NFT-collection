@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
 	Box,
 	CircularProgress,
@@ -9,7 +9,8 @@ import {
 import { StartonButton } from './common/StartonButton'
 import { FAQ } from "./FAQ";
 import {
-	StartonFormikTextField,
+	StartonFormikSelect,
+	StartonFormikTextField, StartonSelectOptionProps
 } from "@starton/ui-nextjs";
 import { Field, Form, Formik } from "formik";
 import { toInteger } from "lodash";
@@ -30,15 +31,6 @@ export interface BodyProps {}
 */
 export const Body: React.FC<BodyProps> = () => {
 
-	const theme = useTheme()
-	const [pictures, setPictures] = useState([])
-	// const [tx, setTx] = useState([])
-	const [isGenerationLoading, setGenerationLoading] = useState(false);
-	const [isGenerated, setGeneration] = useState(false);
-	const [isDeploymentLoading, setDeploymentLoading] = useState(false);
-	const [isDeployed, setDeployment] = useState(false);
-	const [body, setBody] = useState({})
-
 	interface FormikInitialValues {
 		wallet: string | null,
 		network: string | null,
@@ -55,28 +47,22 @@ export const Body: React.FC<BodyProps> = () => {
 		prompt: ''
 	}
 
+	const theme = useTheme()
+	const [pictures, setPictures] = useState([])
+	// const [tx, setTx] = useState([])
+	const [isGenerationLoading, setGenerationLoading] = useState(false);
+	const [isGenerated, setGeneration] = useState(false);
+	const [isDeploymentLoading, setDeploymentLoading] = useState(false);
+	const [isDeployed, setDeployment] = useState(false);
+	const [body, setBody] = useState(initialValues)
+	// const [selected, setSelected] = useState('')
 
-	// const selectOptions = React.useMemo<Array<StartonSelectOptionProps>>(() => {
-	// 	return [
-	// 		{
-	// 			value: 0,
-	// 			children: 'Contract metadata',
-	// 			onClick: () => {
-	// 				setTemplateIndex(0)
-	// 				setJson({ content: JSON.stringify(JSON.parse(jsonTemplates[0]), null, 2), isValid: true })
-	// 			},
-	// 		},
-	// 		{
-	// 			value: 1,
-	// 			children: 'NFT metadata',
-	// 			onClick: () => {
-	// 				setTemplateIndex(1)
-	//
-	// 				setJson({ content: JSON.stringify(JSON.parse(jsonTemplates[1]), null, 2), isValid: true })
-	// 			},
-	// 		},
-	// 	]
-	// }, [])
+	function getSymbol(sentence: string): string {
+		const words: string[] = sentence.split(" ");
+		const initials: string[] = words.map(word => word.charAt(0).toUpperCase());
+		return initials.join("");
+	}
+
 
 	const generatePictures = async (body: any) => {
 		setGenerationLoading(true);
@@ -99,18 +85,18 @@ export const Body: React.FC<BodyProps> = () => {
 	const deployCollection = async () => {
 		setDeploymentLoading(true)
 
-		const body = JSON.stringify({
+		const content: string = JSON.stringify({
 			pictures: pictures ? pictures : [],
-			ownerWallet: '0xA76ed24122193CF53f81F6dBEbE2a1DfF8f9e901',
-			smartContractName: 'Front AI deployed collection',
-			smartContractSymbol: 'FAP'
+			ownerWallet: body.wallet,
+			smartContractName: body.collectionName,
+			smartContractSymbol: getSymbol(body.collectionName as string)
 		})
 
 		await fetch('http://localhost:8000/deploy', {
 			method: 'POST',
 			headers: { 'Content-type': 'application/json; charset=UTF-8' },
 			mode: 'cors',
-			body: body
+			body: content
 		}).then(response => {
 			setDeploymentLoading(false)
 			setDeployment(true)
@@ -129,12 +115,50 @@ export const Body: React.FC<BodyProps> = () => {
 		await generatePictures(body)
 	}
 
+	const selectOptions = useMemo<Array<StartonSelectOptionProps>>(() => {
+			return [
+				{
+					children: 'Ethereum - Mainnet',
+					value: 'ethereum-mainnet',
+				},
+				{
+					children: 'Ethereum - Goerli',
+					value: 'ethereum-goerli',
+				},
+				{
+					children: 'BNB Chain - Mainnet',
+					value: 'binance-mainnet',
+				},
+				{
+					children: 'BNB Chain - Testnet',
+					value: 'binance-testnet',
+				},
+				{
+					children: 'Polygon - Mainnet',
+					value: 'polygon-mainnet',
+				},
+				{
+					children: 'Polygon - Mumbai',
+					value: 'polygon-mumbai',
+				},
+				{
+					children: 'Avalanche - Mainnet',
+					value: 'avalanche-mainnet',
+				},
+				{
+					children: 'Avalanche - Fuji',
+					value: 'avalanche-fuji',
+				},
+
+			]
+		}, [])
+
 	// prompt: 'random abstract majestic complex picture 8k'
 
 	// Render
 	//--------------------------------------------------------------------------
 	return (
-		<Box maxWidth={1192} display="flex" flexDirection="column" gap={10} marginX="auto" marginTop={10} padding={5}>
+		<Box maxWidth={1192} display="flex" flexDirection="column" gap={15} marginX="auto" marginTop={10} padding={5}>
 			<Typography variant="h2" fontWeight={600}>
 				Create your NFT collection{' '}
 				<Typography color="secondary.main" variant="h2" component="span">
@@ -142,95 +166,110 @@ export const Body: React.FC<BodyProps> = () => {
 				</Typography>
 			</Typography>
 
-			<Box display="flex" flexDirection="column" gap={2}>
-				<Typography variant="h3" textTransform="uppercase">
-					Collection details
-				</Typography>
-				<Typography color="text.secondary" variant="body1">
-					We know you can't wait to generate your NFT collection but before that, it is important to add some details so that it is unique.
-				</Typography>
+			<Box style={{ display: "flex", flexDirection: "column", flexWrap: 'wrap', justifyContent: 'space-between' }} gap={7}>
+				<Box display="flex" flexDirection="column" gap={2}>
+					<Typography variant="h3" textTransform="uppercase">
+						Collection details
+					</Typography>
+					<Typography color="text.secondary" variant="body1">
+						We know you can't wait to generate your NFT collection but before that, it is important to add some details so that it is unique.
+					</Typography>
+				</Box>
+
+				<Formik
+					initialValues={initialValues}
+					onSubmit={handleCidSubmit}>
+					<Form>
+						<Box style={{ display: "flex", flexDirection: "column", flexWrap: 'wrap', justifyContent: 'space-between' }} gap={7}>
+
+							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 0 }}>
+								<Field
+									sx={{width: '73%'}}
+									component={StartonFormikTextField}
+									name={'wallet'}
+									label={'Wallet address'}
+									placeholder={'0x...'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+								{/*<Field*/}
+								{/*	sx={{width: '100%'}}*/}
+								{/*	component={StartonFormikSelect}*/}
+								{/*	name={'network'}*/}
+								{/*	selectOptions={selectOptions}*/}
+								{/*	label={'Blockchain / Network'}*/}
+								{/*	placeholder={'Select your blockchain / network'}*/}
+								{/*	placeholderValue={'polygon-mumbai'}*/}
+								{/*	disabled={isGenerationLoading || isDeploymentLoading}*/}
+								{/*/>*/}
+								<Field
+									sx={{width: '25%'}}
+									component={StartonFormikTextField}
+									name={'network'}
+									// selectOptions={selectOptions}
+									label={'Blockchain / Network'}
+									placeholder={'polygon-mumbai'}
+									// placeholderValue={'polygon-mumbai'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+							</Box>
+							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+								<Field
+									sx={{width: '73%'}}
+									component={StartonFormikTextField}
+									name={'collectionName'}
+									label={'Collection name'}
+									placeholder={'Majestic Collection'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+								<Field
+									sx={{width: '25%'}}
+									component={StartonFormikTextField}
+									name={'nbPictures'}
+									label={'Number of pictures'}
+									placeholder={'5'}
+									type={'number'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+							</Box>
+							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+								<Field
+									sx={{width: isGenerationLoading ? '73%' : '83%'}}
+									component={StartonFormikTextField}
+									name={'prompt'}
+									label={'Prompt'}
+									placeholder={'random abstract majestic complex picture 8k'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+								<StartonButton
+									sx={{width: isGenerationLoading ? '25%' : '15%'}}
+									size="small"
+									variant="contained"
+									disabled={isGenerationLoading || isDeploymentLoading}
+									type='submit'
+									startIcon={
+										isGenerationLoading ? (
+											<CircularProgress
+												sx={{
+													width: 3,
+													height: 'unset !important',
+													color: `${theme.palette.secondary.dark} !important`,
+												}}
+											/>
+										) : null
+									}
+								>
+									{isGenerationLoading
+										? 'Generating...'
+										: 'Generate'
+									}
+								</StartonButton>
+							</Box>
+
+						</Box>
+					</Form>
+				</Formik>
+
 			</Box>
-
-			<Formik
-				initialValues={initialValues}
-				onSubmit={handleCidSubmit}>
-				<Form>
-					<Box style={{ display: "flex", flexDirection: "column", flexWrap: 'wrap', justifyContent: 'space-between' }} gap={6}>
-
-						<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
-							<Field
-								sx={{width: '73%'}}
-								component={StartonFormikTextField}
-								name={'wallet'}
-								label={'Wallet address'}
-								placeholder={'0x...'}
-								disabled={isGenerationLoading || isDeploymentLoading}
-							/>
-							<Field
-								sx={{width: '25%'}}
-								component={StartonFormikTextField}
-								// select={true}
-								name={'network'}
-								label={'Blockchain / Network'}
-								placeholder={'polygon-mumbai'}
-								disabled={isGenerationLoading || isDeploymentLoading}
-							/>
-						</Box>
-						<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
-							<Field
-								sx={{width: '73%'}}
-								component={StartonFormikTextField}
-								name={'collectionName'}
-								label={'Collection name'}
-								placeholder={'Majestic Collection'}
-								disabled={isGenerationLoading || isDeploymentLoading}
-							/>
-							<Field
-								sx={{width: '25%'}}
-								component={StartonFormikTextField}
-								name={'nbPictures'}
-								label={'Number of pictures'}
-								placeholder={'5'}
-								type={'number'}
-								disabled={isGenerationLoading || isDeploymentLoading}
-							/>
-						</Box>
-						<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
-							<Field
-								sx={{width: isGenerationLoading ? '73%' : '83%'}}
-								component={StartonFormikTextField}
-								name={'prompt'}
-								label={'Prompt'}
-								placeholder={'random abstract majestic complex picture 8k'}
-								disabled={isGenerationLoading || isDeploymentLoading}
-							/>
-							<StartonButton
-								sx={{width: isGenerationLoading ? '25%' : '15%'}}
-								size="small"
-								variant="contained"
-								disabled={isGenerationLoading || isDeploymentLoading}
-								type='submit'
-								startIcon={
-									isGenerationLoading ? (
-										<CircularProgress
-											sx={{
-												width: 3,
-												height: 'unset !important',
-												color: `${theme.palette.secondary.dark} !important`,
-											}}
-										/>
-									) : null
-								}
-							>
-								{isGenerationLoading
-									? 'Generating...'
-									: 'Generate'
-								}
-							</StartonButton>
-						</Box>
-					</Box>
-				</Form>
-			</Formik>
 
 			{ isGenerated
 				? <Grid
@@ -258,8 +297,11 @@ export const Body: React.FC<BodyProps> = () => {
 
 				{isGenerated
 					? isDeployed
-						? <Box display="flex" flexDirection="row" gap={10} margin="auto" alignItems={'center'} padding={3} flexWrap={'wrap'}>
-							<Box display="flex" flexDirection="row" gap={3} margin="auto" alignItems={'center'} padding={3}>
+						? <Box display="flex" flexDirection="row" gap={4} margin="auto" alignItems={'center'} flexWrap={'wrap'}>
+							<Typography color="secondary.main" variant="body1" marginX={'auto'}>
+								NFT collection successfully deployed! You can see you collection on :
+							</Typography>
+							<Box display="flex" flexDirection="row" gap={3} marginX="auto" alignItems={'center'}>
 								<StartonButton
 									size="large"
 									variant="contained"
@@ -283,7 +325,7 @@ export const Body: React.FC<BodyProps> = () => {
 							</Box>
 						</Box>
 
-						: <Box display="flex" flexDirection="row" gap={10} margin="auto" alignItems={'center'} padding={3} flexWrap={'wrap'}>
+						: <Box display="flex" flexDirection="row" gap={10} margin="auto" alignItems={'center'}>
 							<StartonButton
 								size="large"
 								variant="contained"

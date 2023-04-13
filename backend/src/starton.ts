@@ -5,7 +5,6 @@ class Starton {
   private STARTON_API_URL: string = process.env.STARTON_API_URL || '';
   private STARTON_API_KEY: string = process.env.STARTON_API_KEY || '';
   private STARTON_SIGNER_WALLET: string = process.env.STARTON_SIGNER_WALLET || '';
-  private NETWORK = 'polygon-mumbai';
   private axiosInstance: AxiosInstance;
 
   constructor() {
@@ -83,7 +82,7 @@ class Starton {
     return ipfsJsons
   }
 
-  public async deployContract(smartContractName: string, smartContractSymbol: string, supply: number, contractPreviewCID: string): Promise<any> {
+  public async deployContract(network:string, smartContractName: string, smartContractSymbol: string, supply: number, contractPreviewCID: string): Promise<any> {
     console.log('$> [STARTON]\tdeployContract')
 
     try {
@@ -91,7 +90,7 @@ class Starton {
       const contract = await this.axiosInstance.post(
         "/smart-contract/from-template",
         {
-          network: this.NETWORK,
+          network: network,
           signerWallet: this.STARTON_SIGNER_WALLET,
           templateId: "ERC721_CAPPED_META_TRANSACTION",
           name: smartContractName,
@@ -116,15 +115,15 @@ class Starton {
     }
   }
 
-  public async mintCollection(smartContractName: string, contract: string, ownerWallet: string, cids: Array<string>): Promise<string> {
+  public async mintCollection(network: string, smartContractName: string, contract: string, ownerWallet: string, cids: Array<string>): Promise<string> {
     console.log('$> [STARTON]\tmintCollection')
 
     let transaction;
 
     try {
       for (const i in cids) {
-        transaction = this.axiosInstance.post(
-          `/smart-contract/${this.NETWORK}/${contract}/call`,
+        transaction = await this.axiosInstance.post(
+          `/smart-contract/${network}/${contract}/call`,
           {
             functionName: "mint(address,string)",
             params: [

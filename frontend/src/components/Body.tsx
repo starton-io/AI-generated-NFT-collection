@@ -4,7 +4,7 @@ import {
 	CircularProgress,
 	Typography,
 	useTheme,
-	Grid, ImageList
+	Grid
 } from "@mui/material";
 import { StartonButton } from './common/StartonButton'
 import { FAQ } from "./FAQ";
@@ -13,7 +13,7 @@ import {
 	StartonFormikTextField, StartonSelectOptionProps
 } from "@starton/ui-nextjs";
 import { Field, Form, Formik } from "formik";
-import { toInteger } from "lodash";
+import * as Yup from 'yup'
 import { ElementSvg } from "./common/svg/ElementSvg";
 import { OpenseaSvg } from "./common/svg/OpenseaSvg";
 
@@ -23,6 +23,31 @@ import { OpenseaSvg } from "./common/svg/OpenseaSvg";
 |--------------------------------------------------------------------------
 */
 export interface BodyProps {}
+
+export enum Network {
+	ETHEREUM_MAINNET = "ethereum-mainnet",
+	ETHEREUM_GOERLI = "ethereum-goerli",
+
+	BINANCE_MAINNET = "binance-mainnet",
+	BINANCE_TESTNET = "binance-testnet",
+
+	POLYGON_MAINNET = "polygon-mainnet",
+	POLYGON_MUMBAI = "polygon-mumbai",
+
+	AVALANCHE_MAINNET = "avalanche-mainnet",
+	AVALANCHE_FUJI = "avalanche-fuji",
+}
+
+export const explorerNetwork: Record<Network, string> = {
+	[Network.ETHEREUM_MAINNET]: "ethereum", // DONE
+	[Network.ETHEREUM_GOERLI]: "goerli", // DONE
+	[Network.BINANCE_MAINNET]: "bsc", // DONE
+	[Network.BINANCE_TESTNET]: "bsc-testnet", // DONE
+	[Network.AVALANCHE_MAINNET]: "avalanche", // DONE
+	[Network.AVALANCHE_FUJI]: "avalanche-fuji", // DONE
+	[Network.POLYGON_MAINNET]: "matic", // DONE
+	[Network.POLYGON_MUMBAI]: "mumbai", // DONE
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +72,14 @@ export const Body: React.FC<BodyProps> = () => {
 		prompt: ''
 	}
 
+	const FormValidationSchema = Yup.object().shape({
+		wallet: Yup.string().required().matches(/(0x[a-fA-F0-9]{40}$)/g),
+		network: Yup.mixed<Network>().oneOf(Object.values(Network)).required(),
+		collectionName: Yup.string().required(),
+		nbPictures: Yup.number().required().min(0).max(10),
+		prompt: Yup.string().required(),
+	})
+
 	const theme = useTheme()
 	const [pictures, setPictures] = useState([])
 	// const [tx, setTx] = useState([])
@@ -55,17 +88,31 @@ export const Body: React.FC<BodyProps> = () => {
 	const [isDeploymentLoading, setDeploymentLoading] = useState(false);
 	const [isDeployed, setDeployment] = useState(false);
 	const [body, setBody] = useState(initialValues)
+	const [isTestnet, setTestnet] = useState(false)
+	const [smartContractAddress, setSmartContractAddress] = useState('')
 	// const [selected, setSelected] = useState('')
 
-	function getSymbol(sentence: string): string {
-		const words: string[] = sentence.split(" ");
+	function getCollectionSymbol(collectionName: string): string {
+		const words: string[] = collectionName.split(" ");
 		const initials: string[] = words.map(word => word.charAt(0).toUpperCase());
 		return initials.join("");
 	}
 
+	function getCollectionUrl(collectionName: string): string {
+		const res = collectionName.replace(" ", '-').toLowerCase();
+		return res
+	}
 
 	const generatePictures = async (body: any) => {
 		setGenerationLoading(true);
+
+		if (body.network === ('ethereum-goerli') ||
+			body.network === ('binance-testnet') ||
+			body.network === ('polygon-mumbai') ||
+			body.network === ('avalanche-fuji')
+		) {
+			setTestnet(true)
+		}
 
 		await fetch('http://localhost:8000/generate', {
 			method: 'POST',
@@ -89,7 +136,8 @@ export const Body: React.FC<BodyProps> = () => {
 			pictures: pictures ? pictures : [],
 			ownerWallet: body.wallet,
 			smartContractName: body.collectionName,
-			smartContractSymbol: getSymbol(body.collectionName as string)
+			smartContractSymbol: getCollectionSymbol(body.collectionName as string),
+			network: body.network
 		})
 
 		await fetch('http://localhost:8000/deploy', {
@@ -103,15 +151,14 @@ export const Body: React.FC<BodyProps> = () => {
 			return response.json()
 		}).then(data => {
 			console.log('deployCollection --- ', data)
+			setSmartContractAddress(data.smartContractAddress)
 			// setTx(data)
 		}).catch((e) => { console.error(e)})
 	}
 
 	const handleCidSubmit = async (body: FormikInitialValues) => {
-		console.log('BODY FORM')
 		setBody(body)
 		console.log('BODY - ', body)
-
 		await generatePictures(body)
 	}
 
@@ -119,37 +166,36 @@ export const Body: React.FC<BodyProps> = () => {
 			return [
 				{
 					children: 'Ethereum - Mainnet',
-					value: 'ethereum-mainnet',
+					value: Network.ETHEREUM_MAINNET,
 				},
 				{
 					children: 'Ethereum - Goerli',
-					value: 'ethereum-goerli',
+					value: Network.ETHEREUM_GOERLI,
 				},
 				{
 					children: 'BNB Chain - Mainnet',
-					value: 'binance-mainnet',
+					value: Network.BINANCE_MAINNET,
 				},
 				{
 					children: 'BNB Chain - Testnet',
-					value: 'binance-testnet',
+					value: Network.BINANCE_TESTNET,
 				},
 				{
 					children: 'Polygon - Mainnet',
-					value: 'polygon-mainnet',
+					value: Network.POLYGON_MAINNET,
 				},
 				{
 					children: 'Polygon - Mumbai',
-					value: 'polygon-mumbai',
+					value: Network.POLYGON_MUMBAI,
 				},
 				{
 					children: 'Avalanche - Mainnet',
-					value: 'avalanche-mainnet',
+					value: Network.AVALANCHE_MAINNET,
 				},
 				{
 					children: 'Avalanche - Fuji',
-					value: 'avalanche-fuji',
+					value: Network.AVALANCHE_FUJI,
 				},
-
 			]
 		}, [])
 
@@ -166,7 +212,7 @@ export const Body: React.FC<BodyProps> = () => {
 				</Typography>
 			</Typography>
 
-			<Box style={{ display: "flex", flexDirection: "column", flexWrap: 'wrap', justifyContent: 'space-between' }} gap={7}>
+			<Box style={{ display: "flex", flexDirection: "column", justifyContent: 'space-between' }} gap={7}>
 				<Box display="flex" flexDirection="column" gap={2}>
 					<Typography variant="h3" textTransform="uppercase">
 						Collection details
@@ -178,95 +224,99 @@ export const Body: React.FC<BodyProps> = () => {
 
 				<Formik
 					initialValues={initialValues}
+					validationSchema={FormValidationSchema}
 					onSubmit={handleCidSubmit}>
-					<Form>
-						<Box style={{ display: "flex", flexDirection: "column", flexWrap: 'wrap', justifyContent: 'space-between' }} gap={7}>
+					{/*{(formikProps) => (*/}
+						<Form>
+							{/*<Typography>{JSON.stringify(formikProps)}</Typography>*/}
+							<Box style={{ display: "flex", flexDirection: "column", flexWrap: 'wrap', justifyContent: 'space-between' }} gap={7}>
 
-							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 0 }}>
-								<Field
-									sx={{width: '73%'}}
-									component={StartonFormikTextField}
-									name={'wallet'}
-									label={'Wallet address'}
-									placeholder={'0x...'}
-									disabled={isGenerationLoading || isDeploymentLoading}
-								/>
-								{/*<Field*/}
-								{/*	sx={{width: '100%'}}*/}
-								{/*	component={StartonFormikSelect}*/}
-								{/*	name={'network'}*/}
-								{/*	selectOptions={selectOptions}*/}
-								{/*	label={'Blockchain / Network'}*/}
-								{/*	placeholder={'Select your blockchain / network'}*/}
-								{/*	placeholderValue={'polygon-mumbai'}*/}
-								{/*	disabled={isGenerationLoading || isDeploymentLoading}*/}
-								{/*/>*/}
-								<Field
-									sx={{width: '25%'}}
-									component={StartonFormikTextField}
-									name={'network'}
-									// selectOptions={selectOptions}
-									label={'Blockchain / Network'}
-									placeholder={'polygon-mumbai'}
-									// placeholderValue={'polygon-mumbai'}
-									disabled={isGenerationLoading || isDeploymentLoading}
-								/>
-							</Box>
-							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
-								<Field
-									sx={{width: '73%'}}
-									component={StartonFormikTextField}
-									name={'collectionName'}
-									label={'Collection name'}
-									placeholder={'Majestic Collection'}
-									disabled={isGenerationLoading || isDeploymentLoading}
-								/>
-								<Field
-									sx={{width: '25%'}}
-									component={StartonFormikTextField}
-									name={'nbPictures'}
-									label={'Number of pictures'}
-									placeholder={'5'}
-									type={'number'}
-									disabled={isGenerationLoading || isDeploymentLoading}
-								/>
-							</Box>
-							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
-								<Field
-									sx={{width: isGenerationLoading ? '73%' : '83%'}}
-									component={StartonFormikTextField}
-									name={'prompt'}
-									label={'Prompt'}
-									placeholder={'random abstract majestic complex picture 8k'}
-									disabled={isGenerationLoading || isDeploymentLoading}
-								/>
-								<StartonButton
-									sx={{width: isGenerationLoading ? '25%' : '15%'}}
-									size="small"
-									variant="contained"
-									disabled={isGenerationLoading || isDeploymentLoading}
-									type='submit'
-									startIcon={
-										isGenerationLoading ? (
-											<CircularProgress
-												sx={{
-													width: 3,
-													height: 'unset !important',
-													color: `${theme.palette.secondary.dark} !important`,
-												}}
-											/>
-										) : null
-									}
-								>
-									{isGenerationLoading
-										? 'Generating...'
-										: 'Generate'
-									}
-								</StartonButton>
-							</Box>
+								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 0 }}>
+									<Field
+										sx={{width: '73%'}}
+										component={StartonFormikTextField}
+										name={'wallet'}
+										label={'Wallet address'}
+										placeholder={'0x...'}
+										disabled={isGenerationLoading || isDeploymentLoading}
+									/>
+									<Field
+										sx={{width: '100%'}}
+										component={StartonFormikSelect}
+										name={'network'}
+										selectOptions={selectOptions}
+										label={'Blockchain / Network'}
+										placeholder={'Select your blockchain / network'}
+										placeholderValue={'polygon-mumbai'}
+										disabled={isGenerationLoading || isDeploymentLoading}
+									/>
+									{/*<Field*/}
+									{/*	sx={{width: '25%'}}*/}
+									{/*	component={StartonFormikTextField}*/}
+									{/*	name={'network'}*/}
+									{/*	// selectOptions={selectOptions}*/}
+									{/*	label={'Blockchain / Network'}*/}
+									{/*	placeholder={'polygon-mumbai'}*/}
+									{/*	// placeholderValue={'polygon-mumbai'}*/}
+									{/*	disabled={isGenerationLoading || isDeploymentLoading}*/}
+									{/*/>*/}
+								</Box>
+								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+									<Field
+										sx={{width: '73%'}}
+										component={StartonFormikTextField}
+										name={'collectionName'}
+										label={'Collection name'}
+										placeholder={'Majestic Collection'}
+										disabled={isGenerationLoading || isDeploymentLoading}
+									/>
+									<Field
+										sx={{width: '25%'}}
+										component={StartonFormikTextField}
+										name={'nbPictures'}
+										label={'Number of pictures'}
+										placeholder={'5'}
+										type={'number'}
+										disabled={isGenerationLoading || isDeploymentLoading}
+									/>
+								</Box>
+								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+									<Field
+										sx={{width: isGenerationLoading ? '73%' : '83%'}}
+										component={StartonFormikTextField}
+										name={'prompt'}
+										label={'Prompt'}
+										placeholder={'random abstract majestic complex picture 8k'}
+										disabled={isGenerationLoading || isDeploymentLoading}
+									/>
+									<StartonButton
+										sx={{width: isGenerationLoading ? '25%' : '15%'}}
+										size="small"
+										variant="contained"
+										disabled={isGenerationLoading || isDeploymentLoading}
+										type='submit'
+										startIcon={
+											isGenerationLoading ? (
+												<CircularProgress
+													sx={{
+														width: 3,
+														height: 'unset !important',
+														color: `${theme.palette.secondary.dark} !important`,
+													}}
+												/>
+											) : null
+										}
+									>
+										{isGenerationLoading
+											? 'Generating...'
+											: 'Generate'
+										}
+									</StartonButton>
+								</Box>
 
-						</Box>
-					</Form>
+							</Box>
+						</Form>
+					{/*)}*/}
 				</Formik>
 
 			</Box>
@@ -308,7 +358,10 @@ export const Body: React.FC<BodyProps> = () => {
 									color="primary"
 									disabled={isGenerationLoading}
 									startIcon={<OpenseaSvg />}
-									// onClick={}
+									// href={
+									// 	'https://' + isTestnet ?? '' + 'opensea.io/collection/'
+									// }
+									href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${explorerNetwork[body.network as Network]}/${smartContractAddress}`}
 								>
 									Opensea
 								</StartonButton>
@@ -316,9 +369,9 @@ export const Body: React.FC<BodyProps> = () => {
 									size="large"
 									variant="contained"
 									color="primary"
-									disabled={isGenerationLoading}
+									disabled={true}
 									startIcon={<ElementSvg />}
-								// onClick={deployCollection}
+									href={`https://${isTestnet ? 'testnets.' : ''}element.market/`}
 								>
 									Element
 								</StartonButton>

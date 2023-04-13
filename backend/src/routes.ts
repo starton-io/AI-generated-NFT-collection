@@ -55,7 +55,8 @@ router.post('/deploy', async (req, res) => {
       error: null
     })
   }
-  if (!req.body.smartContractName || !req.body.smartContractSymbol || !req.body.ownerWallet || !req.body.pictures) {
+
+  if (!req.body.smartContractName || !req.body.smartContractSymbol || !req.body.ownerWallet || !req.body.pictures || !req.body.network) {
     const error: string = 'Incomplete request, you must provide address, smartContractName and pictures fields'
     console.log(error)
     return res.status(400).send({
@@ -75,6 +76,7 @@ router.post('/deploy', async (req, res) => {
 
   console.log('body - ', req.body)
 
+  const network: string = req.body.network
   const smartContractName: string = req.body.smartContractName
   const smartContractSymbol: string = req.body.smartContractSymbol
   const ownerWallet = req.body.ownerWallet
@@ -130,11 +132,10 @@ router.post('/deploy', async (req, res) => {
 
   console.log('metadataCids - ', metadataCids)
 
-
   let contract: string = ''
 
   try {
-    contract = await App.starton.deployContract(smartContractName, smartContractSymbol, picturesCids.length, metadataCids[0])
+    contract = await App.starton.deployContract(network, smartContractName, smartContractSymbol, picturesCids.length, metadataCids[0])
   } catch (e) {
     return res.status(500).send({
       message: 'Could not deploy ERC721 smart-contract',
@@ -143,15 +144,28 @@ router.post('/deploy', async (req, res) => {
   }
 
   console.log('contract - ', contract)
+
+
   await new Promise(f=>setTimeout(f, 5000))
-  let transactions = await App.starton.mintCollection(smartContractName, contract, ownerWallet, metadataCids)
+
+
+  let transactions
+  try {
+    transactions = await App.starton.mintCollection(network, smartContractName, contract, ownerWallet, metadataCids)
+  } catch (e) {
+    return res.status(500).send({
+      message: 'Could not mint NFT',
+      error: e
+    })
+  }
 
   console.log('transactions - ', transactions)
-
   console.log('$> [API]\tPOST /deploy - SUCCESS')
 
+  console.log('CCC')
   return res.status(201).send({
     message: 'Collection successfully deployed',
+    smartContractAddress: contract,
     error: null
   })
 });

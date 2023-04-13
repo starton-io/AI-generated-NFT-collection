@@ -58,7 +58,7 @@ class OpenAI {
     const bufferArray: Array<Buffer> = []
 
     if (!pictures.length) {
-      const error: string = 'There is no pictures.'
+      const error: string = 'There is no picture.'
       console.error(error)
       throw error;
     }

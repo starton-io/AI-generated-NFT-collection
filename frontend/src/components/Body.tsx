@@ -219,10 +219,11 @@ export const Body: React.FC<BodyProps> = () => {
 			<Box style={{ display: "flex", flexDirection: "column", justifyContent: 'space-between' }} gap={7}>
 				<Box display="flex" flexDirection="column" gap={2}>
 					<Typography variant="h3" textTransform="uppercase">
-						Collection details
+						Collection parameters
 					</Typography>
 					<Typography color="text.secondary" variant="body1">
-						We know you can't wait to generate your NFT collection but before that, it is important to add some details so that it is unique.
+						We understand your eagerness to create your NFT collection. To do so, enter all the details for your collection.
+						Enter a prompt and click generate to discover the visual assets of your NFTs. You can regenerate assets. When satisfied, click deploy to create your collection.
 					</Typography>
 				</Box>
 

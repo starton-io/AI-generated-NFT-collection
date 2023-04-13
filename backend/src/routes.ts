@@ -57,7 +57,7 @@ router.post('/deploy', async (req, res) => {
   }
 
   if (!req.body.smartContractName || !req.body.smartContractSymbol || !req.body.ownerWallet || !req.body.pictures || !req.body.network) {
-    const error: string = 'Incomplete request, you must provide address, smartContractName and pictures fields'
+    const error: string = 'Incomplete request. You need to provide an address, a Name for your smartContract and a number of pictures for your collection.'
     console.log(error)
     return res.status(400).send({
       message: error,
@@ -66,7 +66,7 @@ router.post('/deploy', async (req, res) => {
   }
 
   if (!req.body.ownerWallet.match(/0x[a-fA-F0-9]{40}/)) {
-    const error: string = 'Invalid Ethereum address format'
+    const error: string = 'Invalid address format'
     console.log(error)
     return res.status(400).send({
       message: error,

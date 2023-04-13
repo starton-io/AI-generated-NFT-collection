@@ -4,7 +4,7 @@ import {
 	CircularProgress,
 	Typography,
 	useTheme,
-	Grid
+	Grid, Link
 } from "@mui/material";
 import { StartonButton } from './common/StartonButton'
 import { FAQ } from "./FAQ";
@@ -360,29 +360,34 @@ export const Body: React.FC<BodyProps> = () => {
 								NFT collection successfully deployed! You can see you collection on :
 							</Typography>
 							<Box display="flex" flexDirection="row" gap={3} marginX="auto" alignItems={'center'}>
-								<StartonButton
-									size="large"
-									variant="contained"
-									color="primary"
-									disabled={isGenerationLoading}
-									startIcon={<OpenseaSvg />}
-									// href={
-									// 	'https://' + isTestnet ?? '' + 'opensea.io/collection/'
-									// }
-									href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${explorerNetwork[body.network as Network]}/${smartContractAddress}`}
-								>
-									Opensea
-								</StartonButton>
-								<StartonButton
-									size="large"
-									variant="contained"
-									color="primary"
-									disabled={true}
-									startIcon={<ElementSvg />}
-									href={`https://${isTestnet ? 'testnets.' : ''}element.market/`}
-								>
-									Element
-								</StartonButton>
+								<Link href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${explorerNetwork[body.network as Network]}/${smartContractAddress}`} target={'_blank'}>
+									<a>
+										<StartonButton
+											size="large"
+											variant="contained"
+											color="primary"
+											disabled={isGenerationLoading}
+											startIcon={<OpenseaSvg />}
+										>
+											Opensea
+										</StartonButton>
+									</a>
+								</Link>
+								<Link href={`https://${isTestnet ? 'testnets.' : ''}element.market/`} target={'_blank'}>
+									<a>
+										<StartonButton
+											size="large"
+											variant="contained"
+											color="primary"
+											disabled={true}
+											startIcon={<ElementSvg />}
+											href={`https://${isTestnet ? 'testnets.' : ''}element.market/`}
+										>
+											Element
+										</StartonButton>
+									</a>
+								</Link>
+
 							</Box>
 						</Box>
 

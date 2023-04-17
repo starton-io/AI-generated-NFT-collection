@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   console.log('$> [API]\tGET /')
-  res.status(200).send(`Welcome to the Starton API !\nCurrent time is : ` + new Date().toISOString());
+  res.status(200).json({ message: `Welcome to the Starton API !\nCurrent time is : ` + new Date().toISOString() });
   console.log('$> [API]\tGET / - SUCCESS')
 });
 
@@ -15,7 +15,7 @@ router.post('/generate', async (req, res) => {
   if (!req.body) {
     const error: string = 'Body is missing in your request'
     console.log(error)
-    return res.status(400).send({
+    return res.status(400).json({
       message: error,
       error: null
     })
@@ -24,20 +24,20 @@ router.post('/generate', async (req, res) => {
   if (!req.body.collectionName || !req.body.nbPictures || !req.body.prompt) {
     const error: string = 'Incomplete request, you must provide collectionName, nbPictures and prompt fields'
     console.log(error)
-    return res.status(400).send({
+    return res.status(400).json({
       message: error,
       error: null
     })
   }
 
   try {
-    const pictureArray = await App.openAi.generatePictures(req.body)
+    const pictureArray: Record<'pictures', string[]> = await App.openAi.generatePictures(req.body)
     console.log('pictureArray - ', pictureArray)
     console.log('$> [API]\tPOST /generate - SUCCESS')
-    return res.status(200).send(pictureArray)
+    return res.json(pictureArray)
   } catch (e) {
     console.error(e)
-    return res.status(502).send({
+    return res.status(502).json({
       message: "OpenAI is not responding",
       error: e
     })
@@ -50,7 +50,7 @@ router.post('/deploy', async (req, res) => {
   if (!req.body) {
     const error: string = 'Body is missing in your request'
     console.log(error)
-    return res.status(400).send({
+    return res.status(400).json({
       message: error,
       error: null
     })
@@ -59,7 +59,7 @@ router.post('/deploy', async (req, res) => {
   if (!req.body.smartContractName || !req.body.smartContractSymbol || !req.body.ownerWallet || !req.body.pictures || !req.body.network) {
     const error: string = 'Incomplete request. You need to provide an address, a Name for your smartContract and a number of pictures for your collection.'
     console.log(error)
-    return res.status(400).send({
+    return res.status(400).json({
       message: error,
       error: null
     })
@@ -68,7 +68,7 @@ router.post('/deploy', async (req, res) => {
   if (!req.body.ownerWallet.match(/0x[a-fA-F0-9]{40}/)) {
     const error: string = 'Invalid address format'
     console.log(error)
-    return res.status(400).send({
+    return res.status(400).json({
       message: error,
       error: null
     })
@@ -85,7 +85,7 @@ router.post('/deploy', async (req, res) => {
   if (!pictures.length) {
     const error: string = 'Incomplete request, pictures array should not be empty'
     console.log(error)
-    return res.status(400).send({
+    return res.status(400).json({
       message: error,
       error: null
     })
@@ -98,7 +98,7 @@ router.post('/deploy', async (req, res) => {
   try {
     picturesBuffers = await App.openAi.extractPictureBuffers(pictures)
   } catch (e) {
-    return res.status(403).send({
+    return res.status(403).json({
       message: 'Could not get picture data',
       error: e
     })
@@ -111,7 +111,7 @@ router.post('/deploy', async (req, res) => {
   try {
     picturesCids = await App.starton.uploadPicturesOnIPFS(picturesBuffers)
   } catch (e) {
-    return res.status(500).send({
+    return res.status(500).json({
       message: 'Could not upload pictures on IPFS',
       error: e
     })
@@ -124,7 +124,7 @@ router.post('/deploy', async (req, res) => {
   try {
     metadataCids = await App.starton.uploadMetadataOnIPFS(smartContractName, picturesCids)
   } catch (e) {
-    return res.status(500).send({
+    return res.status(500).json({
       message: 'Could not upload metadata on IPFS',
       error: e
     })
@@ -137,7 +137,7 @@ router.post('/deploy', async (req, res) => {
   try {
     contract = await App.starton.deployContract(network, smartContractName, smartContractSymbol, picturesCids.length, metadataCids[0])
   } catch (e) {
-    return res.status(500).send({
+    return res.status(500).json({
       message: 'Could not deploy ERC721 smart-contract',
       error: e
     })
@@ -145,15 +145,13 @@ router.post('/deploy', async (req, res) => {
 
   console.log('contract - ', contract)
 
-
   await new Promise(f=>setTimeout(f, 5000))
-
 
   let transactions
   try {
     transactions = await App.starton.mintCollection(network, smartContractName, contract, ownerWallet, metadataCids)
   } catch (e) {
-    return res.status(500).send({
+    return res.status(500).json({
       message: 'Could not mint NFT',
       error: e
     })
@@ -163,7 +161,7 @@ router.post('/deploy', async (req, res) => {
   console.log('$> [API]\tPOST /deploy - SUCCESS')
 
   console.log('CCC')
-  return res.status(201).send({
+  return res.json({
     message: 'Collection successfully deployed',
     smartContractAddress: contract,
     error: null

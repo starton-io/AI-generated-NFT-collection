@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { SetStateAction, useMemo, useState } from "react";
 import {
 	Box,
 	CircularProgress,
@@ -9,6 +9,7 @@ import {
 import { StartonButton } from './common/StartonButton'
 import { FAQ } from "./FAQ";
 import {
+	StartonBlockquote,
 	StartonFormikSelect,
 	StartonFormikTextField, StartonSelectOptionProps
 } from "@starton/ui-nextjs";
@@ -17,6 +18,7 @@ import * as Yup from 'yup'
 import { ElementSvg } from "./common/svg/ElementSvg";
 import { OpenseaSvg } from "./common/svg/OpenseaSvg";
 import { Theme } from "@mui/system";
+import { useSnackbar } from "notistack";
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +27,6 @@ import { Theme } from "@mui/system";
 */
 export interface BodyProps {}
 
-// TO MOVE
 export enum Network {
 	ETHEREUM_MAINNET = "ethereum-mainnet",
 	ETHEREUM_GOERLI = "ethereum-goerli",
@@ -40,17 +41,40 @@ export enum Network {
 	AVALANCHE_FUJI = "avalanche-fuji",
 }
 
-// TO MOVE
 export const explorerNetwork: Record<Network, string> = {
-	[Network.ETHEREUM_MAINNET]: "ethereum", // DONE
-	[Network.ETHEREUM_GOERLI]: "goerli", // DONE
-	[Network.BINANCE_MAINNET]: "bsc", // DONE
-	[Network.BINANCE_TESTNET]: "bsc-testnet", // DONE
-	[Network.AVALANCHE_MAINNET]: "avalanche", // DONE
-	[Network.AVALANCHE_FUJI]: "avalanche-fuji", // DONE
-	[Network.POLYGON_MAINNET]: "matic", // DONE
-	[Network.POLYGON_MUMBAI]: "mumbai", // DONE
+	[Network.ETHEREUM_MAINNET]: "ethereum",
+	[Network.ETHEREUM_GOERLI]: "goerli",
+	[Network.BINANCE_MAINNET]: "bsc",
+	[Network.BINANCE_TESTNET]: "bsc-testnet",
+	[Network.AVALANCHE_MAINNET]: "avalanche",
+	[Network.AVALANCHE_FUJI]: "avalanche-fuji",
+	[Network.POLYGON_MAINNET]: "matic",
+	[Network.POLYGON_MUMBAI]: "mumbai",
 }
+
+export interface FormikInitialValues {
+	wallet: string | null,
+	network: string | null,
+	collectionName: string | null,
+	nbPictures: string | null,
+	prompt: string | null,
+}
+
+const initialValues: FormikInitialValues = {
+	wallet: '',
+	network: '',
+	collectionName: '',
+	nbPictures: '',
+	prompt: ''
+}
+
+const FormValidationSchema = Yup.object().shape({
+	wallet: Yup.string().required().matches(/(0x[a-fA-F0-9]{40}$)/g),
+	network: Yup.mixed<Network>().oneOf(Object.values(Network)).required(),
+	collectionName: Yup.string().required(),
+	nbPictures: Yup.number().required().min(0).max(10),
+	prompt: Yup.string().required(),
+})
 
 /*
 |--------------------------------------------------------------------------
@@ -59,111 +83,19 @@ export const explorerNetwork: Record<Network, string> = {
 */
 export const Body: React.FC<BodyProps> = () => {
 
-	interface FormikInitialValues {
-		wallet: string | null,
-		network: string | null,
-		collectionName: string | null,
-		nbPictures: string | null,
-		prompt: string | null,
-	}
-
-	const initialValues: FormikInitialValues = {
-		wallet: '',
-		network: '',
-		collectionName: '',
-		nbPictures: '',
-		prompt: ''
-	}
-
-	const FormValidationSchema = Yup.object().shape({
-		wallet: Yup.string().required().matches(/(0x[a-fA-F0-9]{40}$)/g),
-		network: Yup.mixed<Network>().oneOf(Object.values(Network)).required(),
-		collectionName: Yup.string().required(),
-		nbPictures: Yup.number().required().min(0).max(10),
-		prompt: Yup.string().required(),
-	})
-
+	const { enqueueSnackbar } = useSnackbar();
 	const theme: Theme = useTheme()
 	const [pictures, setPictures] = useState([])
 	const [isGenerationLoading, setGenerationLoading] = useState(false);
 	const [isGenerated, setGeneration] = useState(false);
 	const [isDeploymentLoading, setDeploymentLoading] = useState(false);
 	const [isDeployed, setDeployment] = useState(false);
-	const [body, setBody] = useState(initialValues)
+	const [formBody, setBody] = useState(initialValues)
 	const [isTestnet, setTestnet] = useState(false)
 	const [smartContractAddress, setSmartContractAddress] = useState('')
-	// const [selected, setSelected] = useState('')
-
-	function getCollectionSymbol(collectionName: string): string {
-		const words: string[] = collectionName.split(" ");
-		const initials: string[] = words.map(word => word.charAt(0).toUpperCase());
-		return initials.join("");
-	}
-
-	// TO DELETE
-	// function getCollectionUrl(collectionName: string): string {
-	// 	const res = collectionName.replace(" ", '-').toLowerCase();
-	// 	return res
-	// }
-
-	const generatePictures = async (body: any) => {
-		setGenerationLoading(true);
-
-		if (body.network === ('ethereum-goerli') ||
-			body.network === ('binance-testnet') ||
-			body.network === ('polygon-mumbai') ||
-			body.network === ('avalanche-fuji')
-		) {
-			setTestnet(true)
-		}
-
-		await fetch('http://localhost:8000/generate', {
-			method: 'POST',
-			headers: { 'Content-type': 'application/json; charset=UTF-8' },
-			mode: 'cors',
-			body: JSON.stringify(body)
-		}).then(response => {
-			setGenerationLoading(false)
-			setGeneration(true)
-			setDeployment(false)
-			return response.json()
-		}).then(data => {
-			setPictures(data.pictures)
-		}).catch((e) => { console.error(e)})
-	}
-
-	const deployCollection = async () => {
-		setDeploymentLoading(true)
-
-		const content: string = JSON.stringify({
-			pictures: pictures ? pictures : [],
-			ownerWallet: body.wallet,
-			smartContractName: body.collectionName,
-			smartContractSymbol: getCollectionSymbol(body.collectionName as string),
-			network: body.network
-		})
-
-		await fetch('http://localhost:8000/deploy', {
-			method: 'POST',
-			headers: { 'Content-type': 'application/json; charset=UTF-8' },
-			mode: 'cors',
-			body: content
-		}).then(response => {
-			setDeploymentLoading(false)
-			setDeployment(true)
-			return response.json()
-		}).then(data => {
-			console.log('deployCollection --- ', data)
-			setSmartContractAddress(data.smartContractAddress)
-		}).catch((e) => { console.error(e)})
-	}
-
-	const handleGenerationSubmit = async (body: FormikInitialValues) => {
-		setBody(body)
-		console.log('BODY - ', body)
-		await generatePictures(body)
-	}
-
+	const [isGenerationError, setGenerationError] = useState(false)
+	const [isDeploymentError, setDeploymentError] = useState(false)
+	const [error, setError] = useState('')
 	const selectOptions: StartonSelectOptionProps[] = useMemo<Array<StartonSelectOptionProps>>(() => {
 		return [
 			{
@@ -201,6 +133,126 @@ export const Body: React.FC<BodyProps> = () => {
 		]
 	}, [])
 
+	function getCollectionSymbol(collectionName: string): string {
+		const words: string[] = collectionName.split(" ");
+		const initials: string[] = words.map(word => word.charAt(0).toUpperCase());
+		return initials.join("");
+	}
+
+	const generatePictures = async (body: FormikInitialValues): Promise<void> => {
+		setGenerationLoading(true);
+		setBody(body)
+
+		if (body.network === ('ethereum-goerli') ||
+			body.network === ('binance-testnet') ||
+			body.network === ('polygon-mumbai') ||
+			body.network === ('avalanche-fuji')
+		) {
+			setTestnet(true)
+		} else {
+			setTestnet(false)
+		}
+
+		try {
+			console.log('TRY - GENERATE')
+			const res: Response = await fetch('http://localhost:8000/generate', {
+				method: 'POST',
+				headers: { 'Content-type': 'application/json; charset=UTF-8' },
+				mode: 'cors',
+				body: JSON.stringify(body)
+			})
+			setDeploymentLoading(false)
+			setDeployment(true)
+
+			if (!res.ok) {
+				enqueueSnackbar((await res.json()).message, {
+					variant: 'error',
+				})
+				new Error((await res.json()).message);
+			}
+
+			setGenerationLoading(false)
+			setGenerationError(false)
+			setDeploymentError(false)
+			setGeneration(true)
+			setDeployment(false)
+			const data = await res.json();
+
+			setPictures(data.pictures)
+			enqueueSnackbar('Pictures successfully generated', {
+				variant: 'success',
+			})
+		} catch (e: any) {
+			console.log('CATCH - GENERATE')
+			console.log('GENERATION ERROR')
+
+			setGeneration(false)
+			setGenerationLoading(false)
+			setGenerationError(true)
+			console.error(e)
+		}
+	}
+
+	const deployCollection = async (): Promise<void> => {
+		setDeploymentLoading(true)
+
+		console.log('000')
+		const content: string = JSON.stringify({
+			pictures: pictures ? pictures : [],
+			ownerWallet: formBody.wallet,
+			smartContractName: formBody.collectionName,
+			smartContractSymbol: getCollectionSymbol(formBody.collectionName as string),
+			network: formBody.network
+		})
+		console.log('111')
+		try {
+			console.log('TRY - DEPLOY')
+			const res: Response = await fetch('http://localhost:8000/deploy', {
+				method: 'POST',
+				headers: { 'Content-type': 'application/json; charset=UTF-8' },
+				mode: 'cors',
+				body: content
+			})
+			console.log('222')
+			if (!res.ok) {
+				console.log('IF')
+				console.log('testtt - ', await res.json())
+				enqueueSnackbar('Deployment error', {
+					variant: 'error',
+				})
+				// enqueueSnackbar((await res.json()).message, {
+				// 	variant: 'error',
+				// })
+				console.log('HERE')
+				// new Error((await res.json()).message);
+			}
+			console.log('333')
+			setDeploymentLoading(false)
+			setDeploymentError(false)
+			setDeployment(true)
+			console.log('444')
+			const data = await res.json();
+
+			console.log('555')
+			console.log('RES --- ', res)
+			console.log('DATA --- ', data)
+
+			setSmartContractAddress(data.smartContractAddress)
+			enqueueSnackbar('Collection successfully deployed', {
+				variant: 'success',
+			})
+
+		} catch (e) {
+			console.log('CATCH - DEPLOY')
+			console.log('DEPLOYMENT ERROR')
+			setDeployment(false)
+			setDeploymentLoading(false)
+			setDeploymentError(true)
+			console.log('AFTER')
+			console.error(e)
+		}
+	}
+
 	// prompt: 'random abstract majestic complex picture 8k'
 
 	// Render
@@ -231,13 +283,13 @@ export const Body: React.FC<BodyProps> = () => {
 				<Formik
 					initialValues={initialValues}
 					validationSchema={FormValidationSchema}
-					onSubmit={handleGenerationSubmit}>
+					onSubmit={generatePictures}>
 					{/*{(formikProps) => (*/}
 						<Form>
 							{/*<Typography>{JSON.stringify(formikProps)}</Typography>*/}
-							<Box style={{ display: "flex", flexDirection: "column", flexWrap: 'wrap', justifyContent: 'space-between' }} gap={7}>
+							<Box style={{ display: "flex", flexDirection: "column", justifyContent: 'space-between' }} gap={7}>
 
-								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 0 }}>
+								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-start', justifyContent: 'space-between', gap: 0 }}>
 									<Field
 										sx={{width: '73%'}}
 										component={StartonFormikTextField}
@@ -256,18 +308,8 @@ export const Body: React.FC<BodyProps> = () => {
 										placeholderValue={'polygon-mumbai'}
 										disabled={isGenerationLoading || isDeploymentLoading}
 									/>
-									{/*<Field*/}
-									{/*	sx={{width: '25%'}}*/}
-									{/*	component={StartonFormikTextField}*/}
-									{/*	name={'network'}*/}
-									{/*	// selectOptions={selectOptions}*/}
-									{/*	label={'Blockchain / Network'}*/}
-									{/*	placeholder={'polygon-mumbai'}*/}
-									{/*	// placeholderValue={'polygon-mumbai'}*/}
-									{/*	disabled={isGenerationLoading || isDeploymentLoading}*/}
-									{/*/>*/}
 								</Box>
-								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-start', justifyContent: 'space-between', gap: 6 }}>
 									<Field
 										sx={{width: '73%'}}
 										component={StartonFormikTextField}
@@ -280,7 +322,7 @@ export const Body: React.FC<BodyProps> = () => {
 										sx={{width: '25%'}}
 										component={StartonFormikTextField}
 										name={'nbPictures'}
-										label={'Number of pictures'}
+										label={'Number of NFTs'}
 										placeholder={'5'}
 										type={'number'}
 										disabled={isGenerationLoading || isDeploymentLoading}
@@ -328,7 +370,7 @@ export const Body: React.FC<BodyProps> = () => {
 			</Box>
 
 			{/*PICTURES*/}
-			{ isGenerated
+			{ isGenerated && !isGenerationError
 				? <Grid
 					container
 					display={'flex'}
@@ -354,13 +396,13 @@ export const Body: React.FC<BodyProps> = () => {
 
 				{/*DEPLOYMENT BUTTONS*/}
 				{isGenerated
-					? isDeployed
+					? isDeployed && !isDeploymentError
 						? <Box display="flex" flexDirection="row" gap={4} margin="auto" alignItems={'center'} flexWrap={'wrap'}>
 							<Typography color="secondary.main" variant="body1" marginX={'auto'}>
 								NFT collection successfully deployed! You can see you collection on :
 							</Typography>
 							<Box display="flex" flexDirection="row" gap={3} marginX="auto" alignItems={'center'}>
-								<Link href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${explorerNetwork[body.network as Network]}/${smartContractAddress}`} target={'_blank'}>
+								<Link href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${explorerNetwork[formBody.network as Network]}/${smartContractAddress}`} target={'_blank'}>
 									<a>
 										<StartonButton
 											size="large"

@@ -11,6 +11,7 @@ router.get('/', async (req, res) => {
 
 router.post('/generate', async (req, res) => {
   console.log('$> [API]\tPOST /generate')
+  console.log(req.body)
 
   if (!req.body) {
     const error: string = 'Body is missing in your request'
@@ -32,13 +33,14 @@ router.post('/generate', async (req, res) => {
 
   try {
     const pictureArray: Record<'pictures', string[]> = await App.openAi.generatePictures(req.body)
-    console.log('pictureArray - ', pictureArray)
+    console.log('pictureArray -', pictureArray)
     console.log('$> [API]\tPOST /generate - SUCCESS')
     return res.json(pictureArray)
   } catch (e) {
+    const error = e
     console.error(e)
-    return res.status(502).json({
-      message: "OpenAI is not responding",
+    return res.status(error.status).json({
+      message: error.message,
       error: e
     })
   }
@@ -57,7 +59,7 @@ router.post('/deploy', async (req, res) => {
   }
 
   if (!req.body.smartContractName || !req.body.smartContractSymbol || !req.body.ownerWallet || !req.body.pictures || !req.body.network) {
-    const error: string = 'Incomplete request. You need to provide an address, a Name for your smartContract and a number of pictures for your collection.'
+    const error: string = 'Incomplete request. You need to provide an address (ownerWallet), a name for your smartContract (smartContractName), a symbol (smartContractSymbol), a network (network) and pictures for your collection (pictures).'
     console.log(error)
     return res.status(400).json({
       message: error,
@@ -74,7 +76,7 @@ router.post('/deploy', async (req, res) => {
     })
   }
 
-  console.log('body - ', req.body)
+  console.log('body -', req.body)
 
   const network: string = req.body.network
   const smartContractName: string = req.body.smartContractName
@@ -98,52 +100,60 @@ router.post('/deploy', async (req, res) => {
   try {
     picturesBuffers = await App.openAi.extractPictureBuffers(pictures)
   } catch (e) {
-    return res.status(403).json({
-      message: 'Could not get picture data',
+    const error = e
+    console.error(e)
+    return res.status(error.status).json({
+      message: error.message,
       error: e
     })
   }
 
-  console.log('picturesBuffers - ', picturesBuffers)
+  console.log('picturesBuffers -', picturesBuffers)
 
   let picturesCids: Array<string> = []
 
   try {
     picturesCids = await App.starton.uploadPicturesOnIPFS(picturesBuffers)
   } catch (e) {
-    return res.status(500).json({
-      message: 'Could not upload pictures on IPFS',
+    const error = e
+    console.error(e)
+    return res.status(error.status).json({
+      message: error.message,
       error: e
     })
   }
 
-  console.log('picturesCids - ', picturesCids)
+  console.log('picturesCids -', picturesCids)
 
   let metadataCids: Array<string> = []
 
   try {
     metadataCids = await App.starton.uploadMetadataOnIPFS(smartContractName, picturesCids)
   } catch (e) {
-    return res.status(500).json({
-      message: 'Could not upload metadata on IPFS',
+    const error = e
+    console.error(e)
+    return res.status(error.status).json({
+      message: error.message,
       error: e
     })
   }
 
-  console.log('metadataCids - ', metadataCids)
+  console.log('metadataCids -', metadataCids)
 
   let contract: string = ''
 
   try {
     contract = await App.starton.deployContract(network, smartContractName, smartContractSymbol, picturesCids.length, metadataCids[0])
   } catch (e) {
-    return res.status(500).json({
-      message: 'Could not deploy ERC721 smart-contract',
+    const error = e
+    console.error(e)
+    return res.status(error.status).json({
+      message: error.message,
       error: e
     })
   }
 
-  console.log('contract - ', contract)
+  console.log('contract -', contract)
 
   await new Promise(f=>setTimeout(f, 5000))
 
@@ -151,16 +161,17 @@ router.post('/deploy', async (req, res) => {
   try {
     transactions = await App.starton.mintCollection(network, smartContractName, contract, ownerWallet, metadataCids)
   } catch (e) {
-    return res.status(500).json({
-      message: 'Could not mint NFT',
+    const error = e
+    console.error(e)
+    return res.status(error.status).json({
+      message: error.message,
       error: e
     })
   }
 
-  console.log('transactions - ', transactions)
+  console.log('transactions -', transactions)
   console.log('$> [API]\tPOST /deploy - SUCCESS')
 
-  console.log('CCC')
   return res.json({
     message: 'Collection successfully deployed',
     smartContractAddress: contract,

@@ -1,5 +1,5 @@
 import React from 'react'
-import { StartonFaq } from './common/StartonFaq'
+import { StartonFaq } from '../common/StartonFaq'
 
 /*
 |--------------------------------------------------------------------------

@@ -23,6 +23,13 @@ import { useGetCanonialUrl } from 'hooks/useGetCanonialUrl'
 import { Dictionary } from 'utils'
 import { AvailableLanguages } from 'contracts'
 import { wagmiClient } from 'services/wagmi/wagmi.service'
+import {
+	StartonNotificationError,
+	StartonNotificationInfo,
+	StartonNotificationSuccess,
+	StartonNotificationWarning
+} from "../components/common/StartonNotification";
+import { SnackbarProvider } from "notistack";
 
 /*
 |--------------------------------------------------------------------------
@@ -97,9 +104,23 @@ export default function StartonApp({
 				<CssBaseline />
 				{/* Wrap in wagmi component and passing client to it*/}
 				<WagmiConfig client={wagmiClient}>
+					<SnackbarProvider
+						maxSnack={5}
+						Components={{
+							info: StartonNotificationInfo,
+							success: StartonNotificationSuccess,
+							warning: StartonNotificationWarning,
+							error: StartonNotificationError,
+						}}
+						anchorOrigin={{
+							vertical: 'bottom',
+							horizontal: 'right',
+						}}
+					>
 					<AppLayout>
 						<Component {...pageProps} />
 					</AppLayout>
+					</SnackbarProvider>
 				</WagmiConfig>
 			</ThemeProvider>
 		</CacheProvider>

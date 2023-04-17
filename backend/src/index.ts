@@ -36,7 +36,7 @@ class App {
     App.app.use((req, res, next) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'POST');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, access-control-allow-origin');
       next();
     });
     const corsOptions = {
@@ -45,7 +45,7 @@ class App {
       allowedHeaders: 'Content-Type',
     };
 
-    App.app.use(cors(corsOptions));
+    // App.app.use(cors(corsOptions));
     App.app.use(Router)
   }
 }

@@ -1,11 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
 import { StartonLogo } from '@starton/ui-nextjs'
-import { StartonFooter, StartonFooterHead } from './common/StartonFooter'
-import { DiscordRounded } from './common/svg/DiscordRounded'
-import { TwitterRounded } from './common/svg/TwitterRounded'
-import { LinkedInRounded } from './common/svg/LinkedInRounded'
-import { StartonButton } from './common/StartonButton'
+import { StartonFooter, StartonFooterHead } from '../common/StartonFooter'
+import { DiscordRounded } from '../common/svg/DiscordRounded'
+import { TwitterRounded } from '../common/svg/TwitterRounded'
+import { LinkedInRounded } from '../common/svg/LinkedInRounded'
+import { StartonButton } from '../common/StartonButton'
 
 /*
 |--------------------------------------------------------------------------

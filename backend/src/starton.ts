@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import * as FormData from "form-data"
 
 class Starton {
@@ -26,21 +26,23 @@ class Starton {
 
     for (const pictureBuffer of pictureBuffers) {
 
-      const data = new FormData()
+      const data: FormData = new FormData()
       data.append("file", pictureBuffer, 'Test filename')
       data.append("isSync", "true")
 
       try {
-        const ipfsFile = await this.axiosInstance.post("/ipfs/file", data, {
+        const ipfsFile: AxiosResponse<any, any> = await this.axiosInstance.post("/ipfs/file", data, {
           headers: {
             "Content-type": `multipart/form-data; boundary=${data.getBoundary()}`,
           },
         })
         ipfsFiles.push(ipfsFile.data.cid)
       } catch (e) {
-        const error = e.response.data
-        console.error(error)
-        throw error;
+        console.error(e.response.data)
+        throw {
+          status: e.response.data.statusCode,
+          message: e.response.data.message
+        };
       }
     }
     console.log('$> [STARTON]\tuploadPicturesOnIPFS - SUCCESS')
@@ -55,7 +57,7 @@ class Starton {
     for (const picturesCid of picturesCids) {
 
       try {
-        const ipfsJson = await this.axiosInstance.post("/ipfs/json", {
+        const ipfsJson: AxiosResponse<any, any> = await this.axiosInstance.post("/ipfs/json", {
             name: `${smartContractName} - Metadata`,
             content: {
               name: `${smartContractName}`,
@@ -72,9 +74,11 @@ class Starton {
         ipfsJsons.push(ipfsJson.data.cid)
 
       } catch (e) {
-        const error = e.response.data
-        console.error(error)
-        throw error;
+        console.error(e.response.data)
+        throw {
+          status: e.response.data.statusCode,
+          message: e.response.data.message
+        };
       }
 
     }
@@ -87,7 +91,7 @@ class Starton {
 
     try {
 
-      const contract = await this.axiosInstance.post(
+      const contract: AxiosResponse<any, any> = await this.axiosInstance.post(
         "/smart-contract/from-template",
         {
           network: network,
@@ -109,16 +113,19 @@ class Starton {
       console.log('$> [STARTON]\tdeployContract - SUCCESS')
       return contract.data.smartContract.address
     } catch (e) {
-      const error = e.response.data
-      console.error(error)
-      throw error;
+      console.error(e.response.data)
+      throw {
+        status: e.response.data.statusCode,
+        message: e.response.data.message
+      };
     }
   }
 
-  public async mintCollection(network: string, smartContractName: string, contract: string, ownerWallet: string, cids: Array<string>): Promise<string> {
+  public async mintCollection(network: string, smartContractName: string, contract: string, ownerWallet: string, cids: Array<string>): Promise<string[]> {
     console.log('$> [STARTON]\tmintCollection')
 
     let transaction;
+    let transactions: string[] = []
 
     try {
       for (const i in cids) {
@@ -134,15 +141,17 @@ class Starton {
             speed: "average"
           }
         )
+        transactions.push(transaction.data.transactionHash)
       }
+      console.log('$> [STARTON]\tmintCollection - SUCCESS')
+      return transactions
     } catch(e) {
-      const error = e.response.data
-      console.error(error)
-      throw error;
+      console.error(e.response.data)
+      throw {
+        status: e.response.data.statusCode,
+        message: e.response.data.message
+      };
     }
-
-    console.log('$> [STARTON]\tmintCollection - SUCCESS')
-    return ''
   }
 }
 

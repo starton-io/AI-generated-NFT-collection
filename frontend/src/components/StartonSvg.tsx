@@ -34,5 +34,6 @@ export const StartonSvg: React.FC<StartonSvgProps> = (props) => {
 				fill={fill}
 			/>
 		</SvgIcon>
+		// StartonLogo
 	)
 }

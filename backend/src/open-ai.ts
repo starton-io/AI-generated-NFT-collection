@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { AxiosResponse } from "axios/index";
 
 class OpenAI {
   private OPEN_AI_API_KEY: string = process.env.OPEN_AI_API_KEY || '';
@@ -32,7 +33,7 @@ class OpenAI {
     const size: string = '1024x1024'
 
     try {
-      const res = await this.axiosInstance.post('/images/generations', {
+      const res: AxiosResponse<any, any> = await this.axiosInstance.post('/images/generations', {
         prompt: prompt,
         n: nbPictures,
         size: size
@@ -45,9 +46,14 @@ class OpenAI {
         pictures: pictureArray
       }
     } catch (e) {
+      console.log('generatePictures ERROR')
+      console.log(e.response.status)
       const error = e.response.data
       console.error(error)
-      throw error;
+      throw {
+        status: e.response.status,
+        message: e.response.data.error.message
+      };
     }
 
   }
@@ -65,16 +71,18 @@ class OpenAI {
 
     try {
       for (const i in pictures) {
-        const res = await axios.get(pictures[i], {
+        const res: AxiosResponse<any, any> = await axios.get(pictures[i], {
           responseType: 'arraybuffer',
         })
-        const buffer = Buffer.from(res.data, "utf-8")
+        const buffer: Buffer = Buffer.from(res.data, "utf-8")
         bufferArray.push(buffer)
       }
     } catch (e) {
-      const error = e.response.data
-      console.error(error)
-      throw error;
+      console.error(e.response)
+      throw {
+        status: e.response.status,
+        message: e.response.statusText
+      };
     }
 
     console.log('$> [OPEN AI]\textractPictureBuffers - SUCCESS')

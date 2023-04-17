@@ -6,8 +6,8 @@ import {
 	useTheme,
 	Grid, Link
 } from "@mui/material";
-import { StartonButton } from './common/StartonButton'
-import { FAQ } from "./FAQ";
+import { StartonButton } from '../../common/StartonButton'
+import { FAQ } from "../../layout/FAQ";
 import {
 	StartonBlockquote,
 	StartonFormikSelect,
@@ -15,10 +15,11 @@ import {
 } from "@starton/ui-nextjs";
 import { Field, Form, Formik } from "formik";
 import * as Yup from 'yup'
-import { ElementSvg } from "./common/svg/ElementSvg";
-import { OpenseaSvg } from "./common/svg/OpenseaSvg";
+import { ElementSvg } from "../../common/svg/ElementSvg";
+import { OpenseaSvg } from "../../common/svg/OpenseaSvg";
 import { Theme } from "@mui/system";
 import { useSnackbar } from "notistack";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 /*
 |--------------------------------------------------------------------------
@@ -81,7 +82,7 @@ const FormValidationSchema = Yup.object().shape({
 | Component
 |--------------------------------------------------------------------------
 */
-export const Body: React.FC<BodyProps> = () => {
+export const HomeContent: React.FC<BodyProps> = () => {
 
 	const { enqueueSnackbar } = useSnackbar();
 	const theme: Theme = useTheme()
@@ -132,6 +133,10 @@ export const Body: React.FC<BodyProps> = () => {
 			},
 		]
 	}, [])
+	const axiosInstance: AxiosInstance = axios.create({
+		baseURL: 'http://localhost:8000/',
+		headers: { 'Content-type': 'application/json; charset=UTF-8' }
+	});
 
 	function getCollectionSymbol(collectionName: string): string {
 		const words: string[] = collectionName.split(" ");
@@ -155,105 +160,71 @@ export const Body: React.FC<BodyProps> = () => {
 
 		try {
 			console.log('TRY - GENERATE')
-			const res: Response = await fetch('http://localhost:8000/generate', {
-				method: 'POST',
-				headers: { 'Content-type': 'application/json; charset=UTF-8' },
-				mode: 'cors',
-				body: JSON.stringify(body)
+			const res: AxiosResponse<any> = await axiosInstance.post('/generate', {
+				...body
 			})
 			setDeploymentLoading(false)
 			setDeployment(true)
-
-			if (!res.ok) {
-				enqueueSnackbar((await res.json()).message, {
-					variant: 'error',
-				})
-				new Error((await res.json()).message);
-			}
 
 			setGenerationLoading(false)
 			setGenerationError(false)
 			setDeploymentError(false)
 			setGeneration(true)
 			setDeployment(false)
-			const data = await res.json();
+			console.log(res)
 
-			setPictures(data.pictures)
-			enqueueSnackbar('Pictures successfully generated', {
+			setPictures(res.data.pictures)
+			enqueueSnackbar('200 - Pictures successfully generated', {
 				variant: 'success',
 			})
 		} catch (e: any) {
-			console.log('CATCH - GENERATE')
-			console.log('GENERATION ERROR')
-
+			const error = e
 			setGeneration(false)
 			setGenerationLoading(false)
 			setGenerationError(true)
-			console.error(e)
+			enqueueSnackbar(`${error.response.status} - ${e.response.data.message}`, {
+				variant: 'error',
+			})
 		}
 	}
 
 	const deployCollection = async (): Promise<void> => {
 		setDeploymentLoading(true)
 
-		console.log('000')
-		const content: string = JSON.stringify({
+		const content: Record<any, any> = {
 			pictures: pictures ? pictures : [],
 			ownerWallet: formBody.wallet,
 			smartContractName: formBody.collectionName,
 			smartContractSymbol: getCollectionSymbol(formBody.collectionName as string),
 			network: formBody.network
-		})
-		console.log('111')
+		}
+		console.log('content --- ', content)
 		try {
 			console.log('TRY - DEPLOY')
-			const res: Response = await fetch('http://localhost:8000/deploy', {
-				method: 'POST',
-				headers: { 'Content-type': 'application/json; charset=UTF-8' },
-				mode: 'cors',
-				body: content
-			})
-			console.log('222')
-			if (!res.ok) {
-				console.log('IF')
-				console.log('testtt - ', await res.json())
-				enqueueSnackbar('Deployment error', {
-					variant: 'error',
+			const res: AxiosResponse<any> = await axiosInstance.post('/deploy', {
+					...content
 				})
-				// enqueueSnackbar((await res.json()).message, {
-				// 	variant: 'error',
-				// })
-				console.log('HERE')
-				// new Error((await res.json()).message);
-			}
-			console.log('333')
 			setDeploymentLoading(false)
 			setDeploymentError(false)
 			setDeployment(true)
-			console.log('444')
-			const data = await res.json();
-
-			console.log('555')
 			console.log('RES --- ', res)
-			console.log('DATA --- ', data)
 
-			setSmartContractAddress(data.smartContractAddress)
-			enqueueSnackbar('Collection successfully deployed', {
+			setSmartContractAddress(res.data.smartContractAddress)
+			enqueueSnackbar('200 - Collection successfully deployed', {
 				variant: 'success',
 			})
-
-		} catch (e) {
+		} catch (e: any) {
+			const error = e
 			console.log('CATCH - DEPLOY')
 			console.log('DEPLOYMENT ERROR')
 			setDeployment(false)
 			setDeploymentLoading(false)
 			setDeploymentError(true)
-			console.log('AFTER')
-			console.error(e)
+			enqueueSnackbar(`${error.response.status} - ${e.response.data.message}`, {
+				variant: 'error',
+			})
 		}
 	}
-
-	// prompt: 'random abstract majestic complex picture 8k'
 
 	// Render
 	//--------------------------------------------------------------------------
@@ -285,85 +256,85 @@ export const Body: React.FC<BodyProps> = () => {
 					validationSchema={FormValidationSchema}
 					onSubmit={generatePictures}>
 					{/*{(formikProps) => (*/}
-						<Form>
-							{/*<Typography>{JSON.stringify(formikProps)}</Typography>*/}
-							<Box style={{ display: "flex", flexDirection: "column", justifyContent: 'space-between' }} gap={7}>
+					<Form>
+						{/*<Typography>{JSON.stringify(formikProps)}</Typography>*/}
+						<Box style={{ display: "flex", flexDirection: "column", justifyContent: 'space-between' }} gap={7}>
 
-								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-start', justifyContent: 'space-between', gap: 0 }}>
-									<Field
-										sx={{width: '73%'}}
-										component={StartonFormikTextField}
-										name={'wallet'}
-										label={'Wallet address'}
-										placeholder={'0x...'}
-										disabled={isGenerationLoading || isDeploymentLoading}
-									/>
-									<Field
-										sx={{width: '100%'}}
-										component={StartonFormikSelect}
-										name={'network'}
-										selectOptions={selectOptions}
-										label={'Blockchain / Network'}
-										placeholder={'Select your blockchain / network'}
-										placeholderValue={'polygon-mumbai'}
-										disabled={isGenerationLoading || isDeploymentLoading}
-									/>
-								</Box>
-								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-start', justifyContent: 'space-between', gap: 6 }}>
-									<Field
-										sx={{width: '73%'}}
-										component={StartonFormikTextField}
-										name={'collectionName'}
-										label={'Collection name'}
-										placeholder={'Majestic Collection'}
-										disabled={isGenerationLoading || isDeploymentLoading}
-									/>
-									<Field
-										sx={{width: '25%'}}
-										component={StartonFormikTextField}
-										name={'nbPictures'}
-										label={'Number of NFTs'}
-										placeholder={'5'}
-										type={'number'}
-										disabled={isGenerationLoading || isDeploymentLoading}
-									/>
-								</Box>
-								<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
-									<Field
-										sx={{width: isGenerationLoading ? '73%' : '83%'}}
-										component={StartonFormikTextField}
-										name={'prompt'}
-										label={'Prompt'}
-										placeholder={'random abstract majestic complex picture 8k'}
-										disabled={isGenerationLoading || isDeploymentLoading}
-									/>
-									<StartonButton
-										sx={{width: isGenerationLoading ? '25%' : '15%'}}
-										size="small"
-										variant="contained"
-										disabled={isGenerationLoading || isDeploymentLoading}
-										type='submit'
-										startIcon={
-											isGenerationLoading ? (
-												<CircularProgress
-													sx={{
-														width: 3,
-														height: 'unset !important',
-														color: `${theme.palette.secondary.dark} !important`,
-													}}
-												/>
-											) : null
-										}
-									>
-										{isGenerationLoading
-											? 'Generating...'
-											: 'Generate'
-										}
-									</StartonButton>
-								</Box>
-
+							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-start', justifyContent: 'space-between', gap: 0 }}>
+								<Field
+									sx={{width: '73%'}}
+									component={StartonFormikTextField}
+									name={'wallet'}
+									label={'Wallet address'}
+									placeholder={'0x...'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+								<Field
+									sx={{width: '100%'}}
+									component={StartonFormikSelect}
+									name={'network'}
+									selectOptions={selectOptions}
+									label={'Blockchain / Network'}
+									placeholder={'Select your blockchain / network'}
+									placeholderValue={'polygon-mumbai'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
 							</Box>
-						</Form>
+							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-start', justifyContent: 'space-between', gap: 6 }}>
+								<Field
+									sx={{width: '73%'}}
+									component={StartonFormikTextField}
+									name={'collectionName'}
+									label={'Collection name'}
+									placeholder={'Majestic Collection'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+								<Field
+									sx={{width: '25%'}}
+									component={StartonFormikTextField}
+									name={'nbPictures'}
+									label={'Number of NFTs'}
+									placeholder={'5'}
+									type={'number'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+							</Box>
+							<Box style={{ display: "flex", flexDirection: "row", alignItems: 'flex-end', justifyContent: 'space-between', gap: 6 }}>
+								<Field
+									sx={{width: isGenerationLoading ? '73%' : '83%'}}
+									component={StartonFormikTextField}
+									name={'prompt'}
+									label={'Prompt'}
+									placeholder={'random abstract majestic complex picture 8k'}
+									disabled={isGenerationLoading || isDeploymentLoading}
+								/>
+								<StartonButton
+									sx={{width: isGenerationLoading ? '25%' : '15%'}}
+									size="small"
+									variant="contained"
+									disabled={isGenerationLoading || isDeploymentLoading}
+									type='submit'
+									startIcon={
+										isGenerationLoading ? (
+											<CircularProgress
+												sx={{
+													width: 3,
+													height: 'unset !important',
+													color: `${theme.palette.secondary.dark} !important`,
+												}}
+											/>
+										) : null
+									}
+								>
+									{isGenerationLoading
+										? 'Generating...'
+										: 'Generate'
+									}
+								</StartonButton>
+							</Box>
+
+						</Box>
+					</Form>
 					{/*)}*/}
 				</Formik>
 
@@ -394,72 +365,72 @@ export const Body: React.FC<BodyProps> = () => {
 				</Grid>
 				: null}
 
-				{/*DEPLOYMENT BUTTONS*/}
-				{isGenerated
-					? isDeployed && !isDeploymentError
-						? <Box display="flex" flexDirection="row" gap={4} margin="auto" alignItems={'center'} flexWrap={'wrap'}>
-							<Typography color="secondary.main" variant="body1" marginX={'auto'}>
-								NFT collection successfully deployed! You can see you collection on :
-							</Typography>
-							<Box display="flex" flexDirection="row" gap={3} marginX="auto" alignItems={'center'}>
-								<Link href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${explorerNetwork[formBody.network as Network]}/${smartContractAddress}`} target={'_blank'}>
-									<a>
-										<StartonButton
-											size="large"
-											variant="contained"
-											color="primary"
-											disabled={isGenerationLoading}
-											startIcon={<OpenseaSvg />}
-										>
-											Opensea
-										</StartonButton>
-									</a>
-								</Link>
-								<Link href={`https://${isTestnet ? 'testnets.' : ''}element.market/`} target={'_blank'}>
-									<a>
-										<StartonButton
-											size="large"
-											variant="contained"
-											color="primary"
-											disabled={true}
-											startIcon={<ElementSvg />}
-											href={`https://${isTestnet ? 'testnets.' : ''}element.market/`}
-										>
-											Element
-										</StartonButton>
-									</a>
-								</Link>
+			{/*DEPLOYMENT BUTTONS*/}
+			{isGenerated
+				? isDeployed && !isDeploymentError
+					? <Box display="flex" flexDirection="row" gap={4} margin="auto" alignItems={'center'} flexWrap={'wrap'}>
+						<Typography color="secondary.main" variant="body1" marginX={'auto'}>
+							NFT collection successfully deployed! You can see your collection on :
+						</Typography>
+						<Box display="flex" flexDirection="row" gap={3} marginX="auto" alignItems={'center'}>
+							<Link href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${explorerNetwork[formBody.network as Network]}/${smartContractAddress}`} target={'_blank'}>
+								<a>
+									<StartonButton
+										size="large"
+										variant="contained"
+										color="primary"
+										disabled={isGenerationLoading}
+										startIcon={<OpenseaSvg />}
+									>
+										Opensea
+									</StartonButton>
+								</a>
+							</Link>
+							<Link href={`https://${isTestnet ? 'testnets.' : ''}element.market/`} target={'_blank'}>
+								<a>
+									<StartonButton
+										size="large"
+										variant="contained"
+										color="primary"
+										disabled={true}
+										startIcon={<ElementSvg />}
+										href={`https://${isTestnet ? 'testnets.' : ''}element.market/`}
+									>
+										Element
+									</StartonButton>
+								</a>
+							</Link>
 
-							</Box>
 						</Box>
+					</Box>
 
-						: <Box display="flex" flexDirection="row" gap={10} margin="auto" alignItems={'center'}>
-							<StartonButton
-								size="large"
-								variant="contained"
-								color="secondary"
-								disabled={isDeploymentLoading}
-								startIcon={
-									isDeploymentLoading ? (
-										<CircularProgress
-											sx={{
-												width: 40,
-												height: 'unset !important',
-												color: `${theme.palette.secondary.dark} !important`,
-											}}
-										/>
-									) : null
-								}
-								onClick={deployCollection}
-							>
-								{isDeploymentLoading
-									? 'Deploying...'
-									: 'Deploy'
-								}
-							</StartonButton>
-						</Box>
-					: null
-				}
+					: <Box display="flex" flexDirection="row" gap={10} margin="auto" alignItems={'center'}>
+						<StartonButton
+							size="large"
+							variant="contained"
+							color="secondary"
+							disabled={isDeploymentLoading || isGenerationLoading}
+							startIcon={
+								isDeploymentLoading ? (
+									<CircularProgress
+										sx={{
+											width: 40,
+											height: 'unset !important',
+											color: `${theme.palette.secondary.dark} !important`,
+										}}
+									/>
+								) : null
+							}
+							onClick={deployCollection}
+						>
+							{isDeploymentLoading
+								? 'Deploying...'
+								: 'Deploy'
+							}
+						</StartonButton>
+					</Box>
+				: null
+			}
 
 			<FAQ />
 		</Box>

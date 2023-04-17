@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Link, Typography } from '@mui/material'
-import { StartonSvg } from "./StartonSvg";
+import { StartonSvg } from "../StartonSvg";
+import { StartonLogo } from "@starton/ui-nextjs";
 
 /*
 |--------------------------------------------------------------------------

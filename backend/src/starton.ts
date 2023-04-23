@@ -1,6 +1,11 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse, isAxiosError } from "axios";
 import * as FormData from "form-data"
 
+/*
+|--------------------------------------------------------------------------
+| Starton class that handle all the blockchain side
+|--------------------------------------------------------------------------
+*/
 class Starton {
   private STARTON_API_URL: string = process.env.STARTON_API_URL || '';
   private STARTON_API_KEY: string = process.env.STARTON_API_KEY || '';
@@ -38,11 +43,14 @@ class Starton {
         })
         ipfsFiles.push(ipfsFile.data.cid)
       } catch (e) {
-        console.error(e.response.data)
-        throw {
-          status: e.response.data.statusCode,
-          message: e.response.data.message
-        };
+        if (isAxiosError(e)) {
+          console.error(e?.response?.data)
+          throw {
+            status: e.response.data.statusCode,
+            message: e.response.data.message
+          };
+        }
+        throw e
       }
     }
     console.log('$> [STARTON]\tuploadPicturesOnIPFS - SUCCESS')
@@ -65,7 +73,7 @@ class Starton {
               image: `ipfs://ipfs/${picturesCid}`,
               attributes: {
                 size: 42,
-                media: "picture",
+                media: "Picture",
                 company: "Starton"
               }
             },
@@ -74,11 +82,14 @@ class Starton {
         ipfsJsons.push(ipfsJson.data.cid)
 
       } catch (e) {
-        console.error(e.response.data)
-        throw {
-          status: e.response.data.statusCode,
-          message: e.response.data.message
-        };
+        if (isAxiosError(e)) {
+          console.error(e?.response?.data)
+          throw {
+            status: e.response.data.statusCode,
+            message: e.response.data.message
+          };
+        }
+        throw e
       }
 
     }
@@ -113,11 +124,14 @@ class Starton {
       console.log('$> [STARTON]\tdeployContract - SUCCESS')
       return contract.data.smartContract.address
     } catch (e) {
-      console.error(e.response.data)
-      throw {
-        status: e.response.data.statusCode,
-        message: e.response.data.message
-      };
+      if (isAxiosError(e)) {
+        console.error(e?.response?.data)
+        throw {
+          status: e.response.data.statusCode,
+          message: e.response.data.message
+        };
+      }
+      throw e
     }
   }
 
@@ -146,11 +160,14 @@ class Starton {
       console.log('$> [STARTON]\tmintCollection - SUCCESS')
       return transactions
     } catch(e) {
-      console.error(e.response.data)
-      throw {
-        status: e.response.data.statusCode,
-        message: e.response.data.message
-      };
+      if (isAxiosError(e)) {
+        console.error(e?.response?.data)
+        throw {
+          status: e.response.data.statusCode,
+          message: e.response.data.message
+        };
+      }
+      throw e
     }
   }
 }

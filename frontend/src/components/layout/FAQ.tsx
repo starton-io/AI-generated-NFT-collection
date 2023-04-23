@@ -1,5 +1,6 @@
 import React from 'react'
 import { StartonFaq } from '../common/StartonFaq'
+import { Box } from "@mui/material";
 
 /*
 |--------------------------------------------------------------------------

@@ -13,7 +13,6 @@ import { DefaultSeo } from 'next-seo'
 import { deepmerge } from '@mui/utils'
 import { frFR, enUS, Localization } from '@mui/material/locale'
 import merge from 'lodash/merge'
-import { WagmiConfig } from 'wagmi'
 import { startonDarkTheme } from '@starton/ui-nextjs'
 import { AppLayout } from '../components/layout/AppLayout'
 import { DEFAULT_SEO_PROPS, DefaultSeoPropsExtra } from 'config/common/seo.config'
@@ -22,7 +21,6 @@ import theme from 'styles/theme'
 import { useGetCanonialUrl } from 'hooks/useGetCanonialUrl'
 import { Dictionary } from 'utils'
 import { AvailableLanguages } from 'contracts'
-import { wagmiClient } from 'services/wagmi/wagmi.service'
 import {
 	StartonNotificationError,
 	StartonNotificationInfo,
@@ -102,8 +100,6 @@ export default function StartonApp({
 				<DefaultSeo {...defaultDataProps} />
 				{/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
 				<CssBaseline />
-				{/* Wrap in wagmi component and passing client to it*/}
-				<WagmiConfig client={wagmiClient}>
 					<SnackbarProvider
 						maxSnack={5}
 						Components={{
@@ -121,7 +117,6 @@ export default function StartonApp({
 						<Component {...pageProps} />
 					</AppLayout>
 					</SnackbarProvider>
-				</WagmiConfig>
 			</ThemeProvider>
 		</CacheProvider>
 	)

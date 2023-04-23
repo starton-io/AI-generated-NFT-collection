@@ -27,12 +27,21 @@ class StartonUtils {
 	|--------------------------------------------------------------------------
 	*/
 	static getURL(): string {
-		const url =
+		const url: string =
 			process?.env?.HOST && process.env.HOST !== ''
 				? process.env.HOST
 				: process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
 				? process.env.VERCEL_URL
 				: 'http://localhost:3000'
+
+		return url.includes('http') ? url : `https://${url}`
+	}
+
+	static getBackURL(): string {
+		const url: string =
+			process?.env?.NEXT_PUBLIC_BACK_URL && process.env.NEXT_PUBLIC_BACK_URL !== ''
+				? process.env.NEXT_PUBLIC_BACK_URL
+				: 'http://localhost:8000'
 
 		return url.includes('http') ? url : `https://${url}`
 	}

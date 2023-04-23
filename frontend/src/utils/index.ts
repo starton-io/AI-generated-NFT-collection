@@ -6,3 +6,4 @@
 export * from './types'
 export * from './createEmotionCache'
 export * from './starton.utils'
+export * from './getCollectionSymbol'

@@ -10,6 +10,7 @@ import { AppLayoutHeader } from './AppLayoutHeader'
 import { AppLayoutFooter } from './AppLayoutFooter'
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { FAQ } from "./FAQ";
 
 /*
 |--------------------------------------------------------------------------

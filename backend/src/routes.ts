@@ -1,9 +1,10 @@
 import * as express from 'express';
 import App from "./index";
+import { Router } from "express";
 
-const router = express.Router();
+const router: Router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res): Promise<void> => {
   console.log('$> [API]\tGET /')
   res.status(200).json({ message: `Welcome to the Starton API !\nCurrent time is : ` + new Date().toISOString() });
   console.log('$> [API]\tGET / - SUCCESS')
@@ -86,7 +87,7 @@ router.post('/deploy', async (req, res) => {
 
   if (!pictures.length) {
     const error: string = 'Incomplete request, pictures array should not be empty'
-    console.log(error)
+    console.error(error)
     return res.status(400).json({
       message: error,
       error: null
@@ -100,10 +101,9 @@ router.post('/deploy', async (req, res) => {
   try {
     picturesBuffers = await App.openAi.extractPictureBuffers(pictures)
   } catch (e) {
-    const error = e
     console.error(e)
-    return res.status(error.status).json({
-      message: error.message,
+    return res.status(e.status).json({
+      message: e.message,
       error: e
     })
   }
@@ -115,10 +115,9 @@ router.post('/deploy', async (req, res) => {
   try {
     picturesCids = await App.starton.uploadPicturesOnIPFS(picturesBuffers)
   } catch (e) {
-    const error = e
     console.error(e)
-    return res.status(error.status).json({
-      message: error.message,
+    return res.status(e.status).json({
+      message: e.message,
       error: e
     })
   }
@@ -130,10 +129,9 @@ router.post('/deploy', async (req, res) => {
   try {
     metadataCids = await App.starton.uploadMetadataOnIPFS(smartContractName, picturesCids)
   } catch (e) {
-    const error = e
     console.error(e)
-    return res.status(error.status).json({
-      message: error.message,
+    return res.status(e.status).json({
+      message: e.message,
       error: e
     })
   }
@@ -145,10 +143,9 @@ router.post('/deploy', async (req, res) => {
   try {
     contract = await App.starton.deployContract(network, smartContractName, smartContractSymbol, picturesCids.length, metadataCids[0])
   } catch (e) {
-    const error = e
     console.error(e)
-    return res.status(error.status).json({
-      message: error.message,
+    return res.status(e.status).json({
+      message: e.message,
       error: e
     })
   }
@@ -161,10 +158,9 @@ router.post('/deploy', async (req, res) => {
   try {
     transactions = await App.starton.mintCollection(network, smartContractName, contract, ownerWallet, metadataCids)
   } catch (e) {
-    const error = e
     console.error(e)
-    return res.status(error.status).json({
-      message: error.message,
+    return res.status(e.status).json({
+      message: e.message,
       error: e
     })
   }

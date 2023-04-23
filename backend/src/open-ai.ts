@@ -1,10 +1,13 @@
-import axios, { AxiosInstance } from 'axios';
-import { AxiosResponse } from "axios/index";
+import axios, { AxiosResponse, AxiosInstance } from 'axios';
 
+/*
+|--------------------------------------------------------------------------
+| OpenAI class that handle all the picture side
+|--------------------------------------------------------------------------
+*/
 class OpenAI {
   private OPEN_AI_API_KEY: string = process.env.OPEN_AI_API_KEY || '';
   private axiosInstance: AxiosInstance;
-  // private PROMPT: string = 'random abstract majestic complex picture 8k';
 
   constructor() {
     console.log('$> [OPEN AI]\tInitializing OpenAI Class...')

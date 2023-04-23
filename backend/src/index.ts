@@ -1,21 +1,25 @@
 import * as dotenv from 'dotenv'
 import * as express from 'express';
+import helmet from "helmet";
 import Starton from "./starton";
 import OpenAI from "./open-ai";
 import * as bodyParser from "body-parser";
-import helmet from "helmet";
 import { Router } from "./routes";
-const cors = require('cors');
-
+import * as cors from "cors";
 
 console.log('$> [CONFIG]\tInitializing environment...')
-dotenv.config({ path: '../.env' })
+dotenv.config()
 console.log('$> [CONFIG]\tEnvironment successfully initialized.')
 
+/*
+|------------------------------------------------------------------------------------------------------------------
+| App class that set up security dependencies, will create Starton and OpenAI instances and will run on the server
+|------------------------------------------------------------------------------------------------------------------
+*/
 class App {
   private API_HOST: string = process.env.API_HOST || 'localhost';
   private API_PORT: string = process.env.API_PORT || '3000';
-  static app: express.Application = express();
+  private app: express.Application = express();
   static starton: Starton;
   static openAi: OpenAI;
 
@@ -24,29 +28,21 @@ class App {
     App.starton = new Starton();
     this.config();
 
-    App.app.listen(this.API_PORT, () => {
+    this.app.listen(this.API_PORT, (): void => {
       console.log(`$> Server started at http://${this.API_HOST}:${this.API_PORT}`);
     });
   }
 
   private config(): void {
-    App.app.use(helmet())
-    App.app.use(bodyParser.json());
-    App.app.use(bodyParser.urlencoded({ extended: false }));
-    App.app.use((req, res, next) => {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Methods', 'POST');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, access-control-allow-origin');
-      next();
-    });
-    const corsOptions = {
-      origin: 'http://localhost:3000',
-      methods: 'GET,POST',
-      allowedHeaders: 'Content-Type',
-    };
+    this.app.use(helmet())
+    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(cors({
+      origin: true,
+      credentials: true,
+    }))
 
-    // App.app.use(cors(corsOptions));
-    App.app.use(Router)
+    this.app.use(Router)
   }
 }
 

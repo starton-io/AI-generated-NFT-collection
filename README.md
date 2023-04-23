@@ -2,7 +2,7 @@
 
 ## Set up
 
-Set up the your `.env` file thanks to the `.env.example` file :
+Set up the your `.env` file thanks to the `.env.example` file in the `backend/`folder:
 ```bash
 API_HOST=localhost
 API_PORT=8000

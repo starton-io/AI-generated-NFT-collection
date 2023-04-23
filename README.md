@@ -16,6 +16,17 @@ STARTON_SIGNER_WALLET=
 OPEN_AI_API_KEY=
 ```
 
+Then, set up the your `.env` file thanks to the `.env.example` file in the `frontend/`folder:
+```bash
+########################################################################################################################
+#
+# STARTON - Environment file
+#
+########################################################################################################################
+
+NEXT_PUBLIC_BACK_URL=http://localhost:8000
+```
+
 ## Run
 
 ### Backend
@@ -46,8 +57,6 @@ yarn dev
 
 The frontend run at http://localhost:3000
 
-BE SURE TO HAVE ENOUGH FAUCET
-
 ## Authors
 
-- Tibo Pendino - Backend Developer @starton.io
+**Tibo Pendino** - _Backend Developer @starton.io_ ([GitHub](https://github.com/tibo-pdn), [LinkedIn](https://www.linkedin.com/in/tibo-pendino/))

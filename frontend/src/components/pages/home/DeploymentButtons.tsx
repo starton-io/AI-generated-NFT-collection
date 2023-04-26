@@ -1,27 +1,32 @@
-import React, { useState } from "react";
-import { useFormikContext } from "formik";
-import { Box, CircularProgress, Grid, Link, Typography, useTheme } from "@mui/material";
-import { DeployBody, explorerNetwork, Network } from "../../../contracts";
-import { StartonButton } from "@starton/ui-nextjs";
-import { OpenseaSvg } from "../../common/svg/OpenseaSvg";
-import { ElementSvg } from "../../common/svg/ElementSvg";
-import { getCollectionSymbol } from "../../../utils";
-import { AxiosResponse } from "axios";
-import { enqueueSnackbar } from "notistack";
-import { axiosInstance } from "../../../config/common/axios.config";
-import { Theme } from "@mui/system";
+/*
+| Developed by Starton
+| Filename : DeploymentButtons.tsx
+| Author : Tibo PENDINO (tibo@starton.io)
+*/
+
+import React, { useState } from 'react'
+import { useFormikContext } from 'formik'
+import { CircularProgress, Grid, Link, Typography, useTheme } from '@mui/material'
+import { StartonButton } from '@starton/ui-nextjs'
+import { AxiosResponse } from 'axios'
+import { enqueueSnackbar } from 'notistack'
+import { Theme } from '@mui/system'
+import { DeployBody, explorerNetwork, Network } from '../../../contracts'
+import { OpenseaSvg } from '../../common/svg/OpenseaSvg'
+import { ElementSvg } from '../../common/svg/ElementSvg'
+import { getCollectionSymbol } from '../../../utils'
+import { axiosInstance } from '../../../config/common/axios.config'
 
 export interface DeploymentButtonsProps {
-	pictures: string[],
-	formBody: Record<any, any>,
-	isTestnet: boolean,
-	isGenerated: boolean,
-	setGeneration: React.Dispatch<React.SetStateAction<boolean>>,
-	isDeployed: boolean,
-	setDeployment: React.Dispatch<React.SetStateAction<boolean>>,
-	isDeploymentError: boolean,
-	setDeploymentError: React.Dispatch<React.SetStateAction<boolean>>,
-	isDeploymentLoading: boolean,
+	pictures: string[]
+	formBody: Record<any, any>
+	isTestnet: boolean
+	isGenerated: boolean
+	isDeployed: boolean
+	setDeployment: React.Dispatch<React.SetStateAction<boolean>>
+	isDeploymentError: boolean
+	setDeploymentError: React.Dispatch<React.SetStateAction<boolean>>
+	isDeploymentLoading: boolean
 	setDeploymentLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -30,16 +35,20 @@ export interface DeploymentButtonsProps {
 | Component
 |--------------------------------------------------------------------------
 */
-export const DeploymentButtons: React.FC<DeploymentButtonsProps> = (props: DeploymentButtonsProps) => {
+export const DeploymentButtons: React.FC<DeploymentButtonsProps> = ({
+	pictures,
+	formBody,
+	isTestnet,
+	isDeployed,
+	setDeployment,
+	isGenerated,
+	isDeploymentLoading,
+	setDeploymentLoading,
+	isDeploymentError,
+	setDeploymentError,
+}) => {
 	const formikContext = useFormikContext()
 	const theme: Theme = useTheme()
-
-	const { pictures, formBody, isTestnet } = props
-	const { isDeployed, setDeployment} = props
-	const { isGenerated, setGeneration} = props
-	const { isDeploymentLoading, setDeploymentLoading} = props
-	const { isDeploymentError, setDeploymentError} = props
-
 	const [smartContractAddress, setSmartContractAddress] = useState('')
 
 	const deployCollection = async () => {
@@ -50,13 +59,13 @@ export const DeploymentButtons: React.FC<DeploymentButtonsProps> = (props: Deplo
 			ownerWallet: formBody.wallet,
 			smartContractName: formBody.collectionName,
 			smartContractSymbol: getCollectionSymbol(formBody.collectionName as string),
-			network: formBody.network
+			network: formBody.network,
 		}
 
 		try {
 			console.log('TRY - DEPLOY')
 			const res: AxiosResponse<any> = await axiosInstance.post('deploy', {
-				...content
+				...content,
 			})
 			setDeploymentLoading(false)
 			setDeploymentError(false)
@@ -80,23 +89,47 @@ export const DeploymentButtons: React.FC<DeploymentButtonsProps> = (props: Deplo
 
 	return (
 		<Grid container direction={'row'} spacing={3} columns={16} justifyContent={'center'}>
-			{ isGenerated
-				? isDeployed && !isDeploymentError
-					? <Grid container item xs={16}>
+			{isGenerated ? (
+				isDeployed && !isDeploymentError ? (
+					<Grid container item xs={16}>
 						<Grid display="flex" flexDirection="column" gap={4} margin="auto" alignItems={'center'}>
 							<Typography color="secondary.main" variant="body1" marginX={'auto'}>
 								NFT collection successfully deployed! You can see your collection on :
 							</Typography>
 							<Grid container direction={'row'} spacing={3} columns={16} justifyContent={'center'}>
 								<Grid item xs={4}>
-
-								<Link href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${explorerNetwork[formBody.network as Network]}/${smartContractAddress}`} target={'_blank'}>
+									<Link
+										href={`https://${isTestnet ? 'testnets.' : ''}opensea.io/assets/${
+											explorerNetwork[formBody.network as Network]
+										}/${smartContractAddress}`}
+										target={'_blank'}
+									>
+										<StartonButton
+											size="large"
+											variant="contained"
+											color="primary"
+											disabled={formikContext.isSubmitting}
+											startIcon={<OpenseaSvg />}
+											sx={{
+												borderRadius: '8px',
+												width: '100%',
+												height: '100%',
+											}}
+										>
+											<Typography variant="body1" textTransform="uppercase" fontWeight={'bold'}>
+												Opensea
+											</Typography>
+										</StartonButton>
+									</Link>
+								</Grid>
+								<Grid item xs={4}>
 									<StartonButton
 										size="large"
 										variant="contained"
 										color="primary"
-										disabled={formikContext.isSubmitting}
-										startIcon={<OpenseaSvg />}
+										disabled={true}
+										startIcon={<ElementSvg />}
+										href={`https://${isTestnet ? 'testnets.' : ''}element.market/`}
 										sx={{
 											borderRadius: '8px',
 											width: '100%',
@@ -104,35 +137,20 @@ export const DeploymentButtons: React.FC<DeploymentButtonsProps> = (props: Deplo
 										}}
 									>
 										<Typography variant="body1" textTransform="uppercase" fontWeight={'bold'}>
-											Opensea
+											Element
 										</Typography>
 									</StartonButton>
-								</Link>
-								</Grid>
-								<Grid item xs={4}>
-
-								<StartonButton
-									size="large"
-									variant="contained"
-									color="primary"
-									disabled={true}
-									startIcon={<ElementSvg />}
-									href={`https://${isTestnet ? 'testnets.' : ''}element.market/`}
-									sx={{
-										borderRadius: '8px',
-										width: '100%',
-										height: '100%',
-									}}
-								>
-									<Typography variant="body1" textTransform="uppercase" fontWeight={'bold'}>
-										Element
-									</Typography>
-								</StartonButton>
 								</Grid>
 							</Grid>
 						</Grid>
 					</Grid>
-					: <Grid item xs={isDeploymentLoading ? 4 : 3} justifyContent={'space-between'} alignItems={'flex-end'}>
+				) : (
+					<Grid
+						item
+						xs={isDeploymentLoading ? 4 : 3}
+						justifyContent={'space-between'}
+						alignItems={'flex-end'}
+					>
 						<StartonButton
 							sx={{
 								borderRadius: '8px',
@@ -142,7 +160,7 @@ export const DeploymentButtons: React.FC<DeploymentButtonsProps> = (props: Deplo
 							size="large"
 							variant="contained"
 							disabled={formikContext.isSubmitting || isDeploymentLoading}
-							type='submit'
+							type="submit"
 							color={'secondary'}
 							startIcon={
 								isDeploymentLoading ? (
@@ -158,14 +176,12 @@ export const DeploymentButtons: React.FC<DeploymentButtonsProps> = (props: Deplo
 							onClick={deployCollection}
 						>
 							<Typography variant="body1" textTransform="uppercase" fontWeight={'bold'}>
-								{isDeploymentLoading
-									? 'Deploying...'
-									: 'Deploy'
-								}
+								{isDeploymentLoading ? 'Deploying...' : 'Deploy'}
 							</Typography>
 						</StartonButton>
 					</Grid>
-				: null }
-			</Grid>
+				)
+			) : null}
+		</Grid>
 	)
 }

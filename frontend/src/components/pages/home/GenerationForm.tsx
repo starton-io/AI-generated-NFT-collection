@@ -1,18 +1,21 @@
-import React, { useMemo, useState } from "react";
-import {
-	CircularProgress,
-	Typography,
-	useTheme,
-	Grid, Box
-} from "@mui/material";
+/*
+| Developed by Starton
+| Filename : GenerationForm.tsx
+| Author : Tibo PENDINO (tibo@starton.io)
+*/
+
+import React from 'react'
+import { CircularProgress, Typography, useTheme, Grid, styled } from '@mui/material'
 import {
 	StartonFormikSelect,
-	StartonFormikTextField, StartonSelectOptionProps
-} from "@starton/ui-nextjs";
-import { StartonButton } from "@starton/ui-nextjs";
-import { Field, useFormikContext } from "formik";
-import { Theme } from "@mui/system";
-import { networkUrl } from "../../../contracts";
+	StartonFormikTextField,
+	StartonSelectOptionProps,
+	StartonButton,
+	StartonFormikSelectProps,
+} from '@starton/ui-nextjs'
+import { Field, useFormikContext } from 'formik'
+import { Theme } from '@mui/system'
+import { networkUrl } from '../../../contracts'
 
 /*
 |--------------------------------------------------------------------------
@@ -20,22 +23,28 @@ import { networkUrl } from "../../../contracts";
 |--------------------------------------------------------------------------
 */
 export interface GenerationFormProps {
-	isDeploymentLoading: boolean,
-	setDeploymentLoading:  React.Dispatch<React.SetStateAction<boolean>>
+	isDeploymentLoading: boolean
+	setDeploymentLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
+
+/*
+|--------------------------------------------------------------------------
+| Styles
+|--------------------------------------------------------------------------
+*/
+const StartonFormikSelectStyled = styled(StartonFormikSelect)<StartonFormikSelectProps>(({ theme }) => ({
+	fontSize: '14px',
+}))
 
 /*
 |--------------------------------------------------------------------------
 | Component
 |--------------------------------------------------------------------------
 */
-export const GenerationForm: React.FC<GenerationFormProps> = (props: GenerationFormProps) => {
-
+export const GenerationForm: React.FC<GenerationFormProps> = ({ isDeploymentLoading }) => {
 	const formikContext = useFormikContext()
-
 	const theme: Theme = useTheme()
-	const { isDeploymentLoading} = props
-	const selectOptions: StartonSelectOptionProps[] = useMemo<Array<StartonSelectOptionProps>>(() => {
+	const selectOptions: StartonSelectOptionProps[] = React.useMemo<Array<StartonSelectOptionProps>>(() => {
 		return networkUrl
 	}, [])
 
@@ -55,7 +64,7 @@ export const GenerationForm: React.FC<GenerationFormProps> = (props: GenerationF
 				</Grid>
 				<Grid item xs={4}>
 					<Field
-						component={StartonFormikSelect}
+						component={StartonFormikSelectStyled}
 						name={'network'}
 						selectOptions={selectOptions}
 						label={'Blockchain / Network'}
@@ -86,7 +95,7 @@ export const GenerationForm: React.FC<GenerationFormProps> = (props: GenerationF
 					/>
 				</Grid>
 			</Grid>
-			<Grid container item direction={'row'} spacing={3} columns={16}  alignItems={'flex-end'}>
+			<Grid container item direction={'row'} spacing={3} columns={16} alignItems={'center'}>
 				<Grid item xs={formikContext.isSubmitting ? 12 : 13}>
 					<Field
 						component={StartonFormikTextField}
@@ -106,7 +115,7 @@ export const GenerationForm: React.FC<GenerationFormProps> = (props: GenerationF
 						size="large"
 						variant="contained"
 						disabled={formikContext.isSubmitting || isDeploymentLoading}
-						type='submit'
+						type="submit"
 						startIcon={
 							formikContext.isSubmitting ? (
 								<CircularProgress
@@ -120,10 +129,7 @@ export const GenerationForm: React.FC<GenerationFormProps> = (props: GenerationF
 						}
 					>
 						<Typography variant="body1" textTransform="uppercase" fontWeight={'bold'}>
-							{formikContext.isSubmitting
-								? 'Generating...'
-								: 'Generate'
-							}
+							{formikContext.isSubmitting ? 'Generating...' : 'Generate'}
 						</Typography>
 					</StartonButton>
 				</Grid>

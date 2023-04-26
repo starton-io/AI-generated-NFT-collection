@@ -1,7 +1,6 @@
 import React from 'react'
 import { Box, Link, Typography } from '@mui/material'
-import { StartonSvg } from "../StartonSvg";
-import { StartonLogo } from "@starton/ui-nextjs";
+import { StartonLogotype } from '@starton/ui-nextjs'
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +23,7 @@ export const Header: React.FC<HeaderProps> = () => {
 				<Typography marginLeft={7} color="text.secondary" variant="body1">
 					Powered by
 				</Typography>
-				<StartonSvg fill="primary.main" sx={{ width: 272, height: 48 }} />
+				<StartonLogotype fill="primary.main" sx={{ width: 272, height: 48 }} />
 			</Link>
 		</Box>
 	)

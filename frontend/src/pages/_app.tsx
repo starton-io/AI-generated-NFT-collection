@@ -14,20 +14,20 @@ import { deepmerge } from '@mui/utils'
 import { frFR, enUS, Localization } from '@mui/material/locale'
 import merge from 'lodash/merge'
 import { startonDarkTheme } from '@starton/ui-nextjs'
+import { SnackbarProvider } from 'notistack'
 import { AppLayout } from '../components/layout/AppLayout'
+import {
+	StartonNotificationError,
+	StartonNotificationInfo,
+	StartonNotificationSuccess,
+	StartonNotificationWarning,
+} from '../components/common/StartonNotification'
 import { DEFAULT_SEO_PROPS, DefaultSeoPropsExtra } from 'config/common/seo.config'
 import { createEmotionCache } from 'utils/createEmotionCache'
 import theme from 'styles/theme'
 import { useGetCanonialUrl } from 'hooks/useGetCanonialUrl'
 import { Dictionary } from 'utils'
 import { AvailableLanguages } from 'contracts'
-import {
-	StartonNotificationError,
-	StartonNotificationInfo,
-	StartonNotificationSuccess,
-	StartonNotificationWarning
-} from "../components/common/StartonNotification";
-import { SnackbarProvider } from "notistack";
 
 /*
 |--------------------------------------------------------------------------
@@ -100,23 +100,23 @@ export default function StartonApp({
 				<DefaultSeo {...defaultDataProps} />
 				{/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
 				<CssBaseline />
-					<SnackbarProvider
-						maxSnack={5}
-						Components={{
-							info: StartonNotificationInfo,
-							success: StartonNotificationSuccess,
-							warning: StartonNotificationWarning,
-							error: StartonNotificationError,
-						}}
-						anchorOrigin={{
-							vertical: 'bottom',
-							horizontal: 'right',
-						}}
-					>
+				<SnackbarProvider
+					maxSnack={5}
+					Components={{
+						info: StartonNotificationInfo,
+						success: StartonNotificationSuccess,
+						warning: StartonNotificationWarning,
+						error: StartonNotificationError,
+					}}
+					anchorOrigin={{
+						vertical: 'bottom',
+						horizontal: 'right',
+					}}
+				>
 					<AppLayout>
 						<Component {...pageProps} />
 					</AppLayout>
-					</SnackbarProvider>
+				</SnackbarProvider>
 			</ThemeProvider>
 		</CacheProvider>
 	)

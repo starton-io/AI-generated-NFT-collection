@@ -5,12 +5,9 @@
 */
 
 import React from 'react'
-import { Box, GlobalStyles } from '@mui/material'
-import { AppLayoutHeader } from './AppLayoutHeader'
-import { AppLayoutFooter } from './AppLayoutFooter'
-import { Footer } from "./Footer";
-import { Header } from "./Header";
-import { FAQ } from "./FAQ";
+import { GlobalStyles } from '@mui/material'
+import { Footer } from './Footer'
+import { Header } from './Header'
 
 /*
 |--------------------------------------------------------------------------
@@ -64,9 +61,10 @@ const inputGlobalStyles = (
 export const AppLayout: React.FC<AppLayoutProps> = (props) => {
 	return (
 		<React.Fragment>
-			<Header/>
+			{inputGlobalStyles}
+			<Header />
 			{props.children}
-			<Footer/>
+			<Footer />
 		</React.Fragment>
 	)
 }

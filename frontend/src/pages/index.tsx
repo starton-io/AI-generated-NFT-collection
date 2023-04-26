@@ -6,7 +6,7 @@
 
 import type { NextPage } from 'next'
 import React from 'react'
-import { HomeContent } from "../components/pages/home";
+import { HomeContent } from '../components/pages/home'
 
 /*
 |--------------------------------------------------------------------------
@@ -14,12 +14,7 @@ import { HomeContent } from "../components/pages/home";
 |--------------------------------------------------------------------------
 */
 const Home: NextPage = () => {
-
-	return (
-		<React.Fragment>
-			<HomeContent/>
-		</React.Fragment>
-	)
+	return <HomeContent />
 }
 
 export default Home

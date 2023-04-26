@@ -1,6 +1,11 @@
+/*
+| Developed by Starton
+| Filename : FAQ.tsx
+| Author : Tibo PENDINO (tibo@starton.io)
+*/
+
 import React from 'react'
 import { StartonFaq } from '../common/StartonFaq'
-import { Box } from "@mui/material";
 
 /*
 |--------------------------------------------------------------------------
@@ -45,11 +50,11 @@ export const FAQ: React.FC<FAQProps> = () => {
 				{
 					summary: 'Do I need to connect with my wallet?',
 					details:
-						'No, you don\'t need to connect your Metamask wallet, all is handled by the backend KMS wallet.',
+						"No, you don't need to connect your Metamask wallet, all is handled by the backend KMS wallet.",
 					seo: {
 						questionName: 'Do I need to connect with my wallet?',
 						acceptedAnswerText:
-							'No, you don\'t need to connect your Metamask wallet, all is handled by the backend KMS wallet.',
+							"No, you don't need to connect your Metamask wallet, all is handled by the backend KMS wallet.",
 					},
 				},
 				{

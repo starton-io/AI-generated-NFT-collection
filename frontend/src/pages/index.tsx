@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : index.tsx
-| Author : Philippe DESPLATS (philippe@starton.io)
+| Author : Philippe DESPLATS (philippe@starton.com)
 */
 
 import type { NextPage } from 'next'

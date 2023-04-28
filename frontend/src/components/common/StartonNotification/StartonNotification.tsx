@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : StartonNotification.tsx
-| Author : Tibo Pendino (tibo@starton.io)
+| Author : Tibo Pendino (tibo@starton.com)
 */
 
 import React from 'react'

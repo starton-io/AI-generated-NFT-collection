@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : notistack.config.ts
-| Author : Tibo Pendino (tibo@starton.io)
+| Author : Tibo Pendino (tibo@starton.com)
 */
 
 import { AlertColor } from '@mui/material'

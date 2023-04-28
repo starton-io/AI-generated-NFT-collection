@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : StartonButton.tsx
-| Author : Calixte De Tourris (calixte@starton.io)
+| Author : Calixte De Tourris (calixte@starton.com)
 */
 
 import React, { CSSProperties } from 'react'

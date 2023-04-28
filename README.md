@@ -7,8 +7,8 @@ Set up the your `.env` file thanks to the `.env.example` file in the `backend/`f
 API_HOST=localhost
 API_PORT=8000
 
-## Put on the following line your Starton API key (available at https://app.starton.io)
-STARTON_API_URL='https://api.starton.io/v3'
+## Put on the following line your Starton API key (available at https://app.starton.com)
+STARTON_API_URL='https://api.starton.com/v3'
 STARTON_API_KEY=
 STARTON_SIGNER_WALLET=
 
@@ -59,4 +59,4 @@ The frontend run at http://localhost:3000
 
 ## Authors
 
-**Tibo Pendino** - _Backend Developer @starton.io_ ([GitHub](https://github.com/tibo-pdn), [LinkedIn](https://www.linkedin.com/in/tibo-pendino/))
+**Tibo Pendino** - _Backend Developer @starton.com_ ([GitHub](https://github.com/tibo-pdn), [LinkedIn](https://www.linkedin.com/in/tibo-pendino/))

@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : Starton.ts
-| Author : Tibo PENDINO (tibo@starton.io)
+| Author : Tibo PENDINO (tibo@starton.com)
 */
 
 export interface DeployBody {

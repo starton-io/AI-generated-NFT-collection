@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = () => {
 	//--------------------------------------------------------------------------
 	return (
 		<Box padding={10} paddingBottom={5}>
-			<Link href="https://starton.io" underline="none">
+			<Link href="https://starton.com" underline="none">
 				<Typography marginLeft={7} color="text.secondary" variant="body1">
 					Powered by
 				</Typography>

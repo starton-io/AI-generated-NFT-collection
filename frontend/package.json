@@ -4,9 +4,9 @@
 	"private": true,
 	"license": "Apache-2.0",
 	"author": {
-		"email": "hello@starton.io",
+		"email": "hello@starton.com",
 		"name": "Starton",
-		"url": "https://www.starton.io/"
+		"url": "https://www.starton.com/"
 	},
 	"scripts": {
 		"start": "next start",

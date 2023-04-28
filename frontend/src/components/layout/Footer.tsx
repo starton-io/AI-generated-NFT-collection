@@ -14,13 +14,13 @@ import { StartonButton } from '../common/StartonButton'
 */
 const footerButtons = [
 	{
-		href: 'https://starton.io/',
+		href: 'https://starton.com/',
 		target: '_blank',
 		icon: <StartonLogo fill="#000" />,
 		label: 'Starton',
 	},
 	{
-		href: 'https://discord.starton.io/',
+		href: 'https://discord.starton.com/',
 		target: '_blank',
 		icon: <DiscordRounded />,
 		label: 'Discord',

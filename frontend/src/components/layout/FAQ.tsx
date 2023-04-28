@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : FAQ.tsx
-| Author : Tibo PENDINO (tibo@starton.io)
+| Author : Tibo PENDINO (tibo@starton.com)
 */
 
 import React from 'react'
@@ -70,21 +70,21 @@ export const FAQ: React.FC<FAQProps> = () => {
 				{
 					summary: 'Can I modify this Project?',
 					details:
-						'Obviously ! You can access the public GitHub repository at https://github.com/starton-io/XXX_TO_DO_XXX and you have a tutorial to reproduce it at https://docs.starton.io/XXX_TO_DO_XXX. You need only 3 things : a Starton API key (available at https://app.starton.io), a wallet on the Starton KMS, and an Open AI API key (available at https://platform.openai.com/account/api-keys)',
+						'Obviously ! You can access the public GitHub repository at https://github.com/starton-io/XXX_TO_DO_XXX and you have a tutorial to reproduce it at https://docs.starton.com/XXX_TO_DO_XXX. You need only 3 things : a Starton API key (available at https://app.starton.com), a wallet on the Starton KMS, and an Open AI API key (available at https://platform.openai.com/account/api-keys)',
 					seo: {
 						questionName: 'Can I modify this Project?',
 						acceptedAnswerText:
-							'Obviously ! You can access the public GitHub repository at https://github.com/starton-io/XXX_TO_DO_XXX and you have a tutorial to reproduce it at https://docs.starton.io/XXX_TO_DO_XXX. You need only 3 things : a Starton API key (available at https://app.starton.io), a wallet on the Starton KMS, and an Open AI API key (available at https://platform.openai.com/account/api-keys)',
+							'Obviously ! You can access the public GitHub repository at https://github.com/starton-io/XXX_TO_DO_XXX and you have a tutorial to reproduce it at https://docs.starton.com/XXX_TO_DO_XXX. You need only 3 things : a Starton API key (available at https://app.starton.com), a wallet on the Starton KMS, and an Open AI API key (available at https://platform.openai.com/account/api-keys)',
 					},
 				},
 				{
 					summary: 'What is Starton?',
 					details:
-						'Starton provides developers with a full set of tools to integrate WEB3 features into web applications without thinking about blockchain complexity. Please visit our website for further information (https://www.starton.io)',
+						'Starton provides developers with a full set of tools to integrate WEB3 features into web applications without thinking about blockchain complexity. Please visit our website for further information (https://www.starton.com)',
 					seo: {
 						questionName: 'What is Starton?',
 						acceptedAnswerText:
-							'Starton provides developers with a full set of tools to integrate WEB3 features into web applications without thinking about blockchain complexity. Please visit our website for further information (https://www.starton.io)',
+							'Starton provides developers with a full set of tools to integrate WEB3 features into web applications without thinking about blockchain complexity. Please visit our website for further information (https://www.starton.com)',
 					},
 				},
 			]}

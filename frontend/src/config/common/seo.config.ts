@@ -2,7 +2,7 @@
 | Developed by Starton
 | Filename : seo.constants.ts
 | Description : All SEO constants for Starton.
-| Author : Philippe DESPLATS (philippe@starton.io)
+| Author : Philippe DESPLATS (philippe@starton.com)
 */
 
 import { DefaultSeoProps } from 'next-seo/lib/types'

@@ -7,7 +7,7 @@
     "start": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts\"",
     "dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts\""
   },
-  "author": "Tibo Pendino <tibo@starton.io>",
+  "author": "Tibo Pendino <tibo@starton.com>",
   "license": "ISC",
   "dependencies": {
     "@types/cors": "^2.8.13",

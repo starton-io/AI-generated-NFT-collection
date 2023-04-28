@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : index.ts
-| Author : Tibo PENDINO (tibo@starton.io)
+| Author : Tibo PENDINO (tibo@starton.com)
 */
 
 export * from './ElementSvg'

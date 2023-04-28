@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : DeploymentButtons.tsx
-| Author : Tibo PENDINO (tibo@starton.io)
+| Author : Tibo PENDINO (tibo@starton.com)
 */
 
 import React, { useState } from 'react'

@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : StartonFooterBody
-| Author : Calixte DE TOURRIS (calixte@starton.io)
+| Author : Calixte DE TOURRIS (calixte@starton.com)
 */
 
 import React from 'react'

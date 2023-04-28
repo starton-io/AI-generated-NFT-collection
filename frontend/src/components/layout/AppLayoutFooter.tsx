@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : AppLayoutFooter.tsx
-| Author : Philippe DESPLATS (philippe@starton.io)
+| Author : Philippe DESPLATS (philippe@starton.com)
 */
 
 import React from 'react'
@@ -39,17 +39,17 @@ export const AppLayoutFooter: React.FC<AppLayoutFooterProps> = () => {
 			{
 				sentence: `${t('common:footer.join-us')}`,
 				name: 'discord',
-				href: 'https://discord.starton.io',
+				href: 'https://discord.starton.com',
 			},
 			{
 				sentence: `${t('common:footer.discover')}`,
 				name: `${t('common:footer.website')}`,
-				href: 'https://starton.io',
+				href: 'https://starton.com',
 			},
 			{
 				sentence: `${t('common:footer.start-building')}`,
 				name: 'web3',
-				href: 'https://starton.io',
+				href: 'https://starton.com',
 			},
 		]
 	}, [t])

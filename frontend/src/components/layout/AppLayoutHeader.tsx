@@ -1,7 +1,7 @@
 /*
 | Developed by Starton
 | Filename : AppLayoutHeader.tsx
-| Author : Philippe DESPLATS (philippe@starton.io)
+| Author : Philippe DESPLATS (philippe@starton.com)
 */
 
 import React from 'react'
